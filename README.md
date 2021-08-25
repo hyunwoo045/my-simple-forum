@@ -11,17 +11,17 @@ Vue.js 와 데이터베이스(MySQL), 클라우드 서버(AWS) 학습을 주 목
 ## 목차
 
 - [Frontend](#Frontend)
-  - [vue-router](#Vue-Router)
-  - [axios를 이용한 API 요청](#axios로-API-요청)
+  - [Vue Router](#Vue-Router)
+  - [axios로 API 요청](#axios로-API-요청)
   - [Webpack Proxy 설정](#Webpack-Proxy-설정)
 - [Backend](#Backend)
-  - [node.js mysql](#Node.js-MySQL)
+  - [Nodejs MySQL](#Nodejs-MySQL)
   - [Express Generator](#Express-Generator)
   - [pm2](#pm2)
 - [데이터베이스](#데이터베이스)
 - [AWS](#AWS)
   - [RDS 서버 생성하기](#RDS-서버-생성하기)
-  - [RDS 서버 접속하기](#RDS-인스턴스에-접속해보기)
+  - [RDS 인스턴스에 접속해보기](#RDS-인스턴스에-접속해보기)
   - [mariaDB 한글 입력 오류 해결 방법](#mariaDB-한글-입력-오류-해결-방법)
 
 <br />
@@ -223,7 +223,7 @@ module.exports = router;
 
 <br />
 
-### Node.js MySQL
+### Nodejs MySQL
 
 Node.js 환경에서 mysql 을 제어하기 위해 패키지를 설치합니다.
 
