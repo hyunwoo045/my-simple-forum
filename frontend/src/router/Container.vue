@@ -27,14 +27,14 @@ export default {
     }
   },
   created() {
-    this.$http.get('/api/home').then((response) => {
+    this.$http.get('/api/content').then((response) => {
       console.log(response)
       this.contents = response.data;
     })
   },
   methods: {
     readContent(id) {
-      this.$http.get(`/api/home?id=${id}`).then(response => {
+      this.$http.get(`/api/content?id=${id}`).then(response => {
         let data = response.data[0]
         this.$router.push({
           name: 'Read',

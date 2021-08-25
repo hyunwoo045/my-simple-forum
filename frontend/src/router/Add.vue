@@ -71,8 +71,14 @@ export default {
       this.$router.go(-1);
     },
     createHandler() {
-      this.$http.post('/api/create', {
-        mode: this.mode,
+      let url = ''
+      if (this.mode === 'modify') {
+        url = '/api/content/modify'
+      } else {
+        url = '/api/content/create'
+      }
+
+      this.$http.post(url, {
         id: this.contentId,
         author: this.author,
         title: this.curTitle,

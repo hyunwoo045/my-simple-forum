@@ -17,8 +17,10 @@ Vue.js 와 데이터베이스(MySQL), 클라우드 서버(AWS) 학습을 주 목
 - [Backend](#Backend)
   - [node.js mysql](#Node.js-MySQL)
   - [Express Generator](#Express-Generator)
+  - [pm2](#pm2)
 - [데이터베이스](#데이터베이스)
 - [AWS](https://github.com/hyunwoo045/vue3-board/tree/master/docs/aws)
+  - [RDS 서버 생성하기](#RDS-서버-생성하기)
 
 <br />
 
@@ -272,15 +274,42 @@ module.exports = router;
 - `mysql.createConnection()` 메서드로 db server에 연결 및 tutorial db 를 사용하도록 함.
 - `createConnection().query()` 메서드로 쿼리문 실행. 메서드의 두 번째 인자인 콜백 함수의 두 번째 인자 결과값을 내부에서 api 응답으로 전송.
 
+코드를 작성한 후 `localhost:3000` 에 접속하면 contents 테이블의 내용이 json 의 형태로 출력되는 것을 확인할 수 있습니다.
+
 <br />
+
+### pm2
+
+SSH Section 을 종료하더라도 서버가 계속 돌아가도록 PM2 프로세스 관리자를 사용합니다.
+
+설치
+
+```
+npm install pm2 -g
+```
+
+명령어
+동작 | 명령어
+-|-
+실행 | pm2 start app.js
+리스트 확인 | pm2 list
+중지 | pm2 stop app
+재시작 | pm2 restart app
+삭제 | pm2 delete app
+로그확인 | pm2 log
+
+- 서버를 실행할 때 --watch 옵션을 붙히면 코드를 수정하였을 때 서버가 알아서 재시작된다.
+- ex) pm2 start app.js --watch
+
+  <br />
 
 ---
 
-## 데이터 베이스
+## 데이터베이스
 
 데이터베이스에 대한 노트는 아래 문서로 우선 대체합니다.
 
-[데이터베이스(MySQL)](https://github.com/hyunwoo045/vue3-board/tree/master/docs/mysql/database)
+[데이터베이스(MySQL) 문서로 이동](https://github.com/hyunwoo045/vue3-board/tree/master/docs/mysql/database)
 
 <br />
 
@@ -288,6 +317,75 @@ module.exports = router;
 
 ## AWS
 
-AWS에 대한 노트느 아래 문서로 우선 대체합니다.
+AWS에 대한 노트는 아래 문서로 우선 대체합니다.
 
-[AWS](https://github.com/hyunwoo045/vue3-board/tree/master/docs/aws)
+[AWS 문서로 이동](https://github.com/hyunwoo045/vue3-board/tree/master/docs/aws)
+
+### RDS 서버 생성하기
+
+1. 서비스 - 데이터베이스 - RDS 를 클릭
+
+![Create RDS](./images/create_rds_1.png)
+
+2. 좌측 데이터베이스 클릭 - 데이터베이스 생성 클릭
+
+![Create RDS](./images/create_rds_2.png)
+
+3. MariaDB 를 사용해 봅니다. MariaDB 클릭
+
+![Create RDS](./images/create_rds_3.png)
+
+4. 설정
+
+- 식별자 이름, 마스터 사용자 이름과 암호를 입력합니다.
+- 마스터 사용자 이름과 암호의 경우 예전 기본 예시에서의 `root` 와 비밀번호, 즉 데이터베이스에 접속할 때에 필요한 id, password 이니 기억해둡니다.
+
+![Create RDS](./images/create_rds_5.png)
+
+5. 연결
+
+- 퍼블릭 엑세스를 `예`로 지정합니다. 원격 제어가 가능하게 하기 위해서입니다.
+
+![Create RDS](./images/create_rds_6.png)
+
+6. 데이터베이스 옵션
+
+- default database를 하나 생성합니다.
+
+![Create RDS](./images/create_rds_7.png)
+
+<br />
+
+또한 원격 제어가 가능하도록 추가 설정을 해주어야 합니다.
+
+- Amazon RDS 페이지 - 데이터베이스 - DB 식별자 클릭
+
+![Create RDS](./images/create_rds_8.png)
+
+- 연결 & 보안 탭 - 보안 에 VPN 보안 그룹이 있습니다. 아래 클릭 가능한 링크를 클릭
+
+![Create RDS](./images/create_rds_9.png)
+
+- 아래 인바운드 규칙 - Edit inbound rules 클릭
+
+![Create RDS](./images/create_rds_10.png)
+
+- 모든 TCP에 대한 접속을 허용합니다.
+  - 규칙 추가 - 유형에 모든 TCP - 소스에 어디서든 - 규칙 저장 클릭
+
+![Create RDS](./images/create_rds_11.png)
+
+### RDS 인스턴스에 접속해보기
+
+MySQL Workbench 에서 접속을 시험해 보겠습니다.
+
+![Access RDS](./images/access_rds_1.png)
+
+1. RDS 인스턴스의 엔드포인트
+2. 포트
+3. 마스터 사용자 이름
+4. DB 이름
+
+OK 를 클릭하면 패스워드를 입력하는 창이 뜹니다. 패스워드를 입력하면 정상적으로 DB에 접속하게 됩니다.
+
+![Access RDS](./images/access_rds_2.png)

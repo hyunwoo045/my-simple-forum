@@ -67,7 +67,8 @@
 <script>
 export default {
   created() {
-    this.$http.get(`/api/read?id=${this.$route.params.id}`).then(response => {
+    /* LOAD COMMENTS */
+    this.$http.get(`/api/comment?id=${this.$route.params.id}`).then(response => {
       console.log('READ', response)
       this.comments = response.data;
     })
@@ -97,13 +98,13 @@ export default {
     },
     async deleteHandler() {
       let id = this.$route.params.id;
-      await this.$http.post('/api/delete', { id }).then(response => {
+      await this.$http.post('/api/content/delete', { id }).then(response => {
         console.log(response)
       })
       this.$router.push('/')
     },
     addComment() {
-      this.$http.post('/api/addcomment', {
+      this.$http.post('/api/comment/create', {
         author: this.commentAuthor,
         description: this.commentDescription,
         content_id: this.$route.params.id
@@ -111,7 +112,7 @@ export default {
         console.log(response)
       });
       
-      this.$http.get(`/api/read?id=${this.$route.params.id}`)
+      this.$http.get(`/api/comment?id=${this.$route.params.id}`)
       .then(response => {
         console.log('READ', response)
         this.comments = response.data;
@@ -128,7 +129,7 @@ export default {
         console.log(response);
       });
 
-      this.$http.get(`/api/read?id=${this.$route.params.id}`)
+      this.$http.get(`/api/comment?id=${this.$route.params.id}`)
       .then(response => {
         console.log('READ', response)
         this.comments = response.data;
