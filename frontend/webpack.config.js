@@ -22,7 +22,7 @@ module.exports = {
   // 결과물(번들)을 반환하는 설정
   output: {
     // resolve 는 첫째 인자와 둘 째 인자를 합쳐주고, __dirname 은 현재 파일의 경로를 나타낸다.
-    path: path.resolve(__dirname, "../dist"),
+    path: path.resolve(__dirname, "dist"),
     filename: "main.js",
     clean: true,
   },
