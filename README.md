@@ -21,6 +21,7 @@ Vue.js 와 데이터베이스(MySQL), 클라우드 서버(AWS) 학습을 주 목
 - [데이터베이스](#데이터베이스)
 - [AWS](https://github.com/hyunwoo045/vue3-board/tree/master/docs/aws)
   - [RDS 서버 생성하기](#RDS-서버-생성하기)
+  - [RDS 서버 접속하기](#RDS-인스턴스에-접속해보기)
 
 <br />
 
