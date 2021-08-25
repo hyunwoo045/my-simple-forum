@@ -153,6 +153,7 @@ export default {
     }
     .read-description {
       height: 300px;
+      white-space: pre-line;
     }
   }
   
