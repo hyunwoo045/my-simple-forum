@@ -8,11 +8,11 @@ Vue.js 와 데이터베이스(MySQL), 클라우드 서버(AWS) 학습을 주 목
 
 - 목표
 
-- [Frontend](##Frontend)
+- [Frontend](#Frontend)
 
-- [Backend](##Backend)
-  - [데이터베이스](###데이터베이스)
-  - [express-router](###Express-Router)
+- [Backend](#Backend)
+  - [데이터베이스](#데이터베이스)
+  - [express-router](#Express-Router)
 - [AWS]
 
 <br />
