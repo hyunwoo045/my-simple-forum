@@ -19,9 +19,10 @@ Vue.js 와 데이터베이스(MySQL), 클라우드 서버(AWS) 학습을 주 목
   - [Express Generator](#Express-Generator)
   - [pm2](#pm2)
 - [데이터베이스](#데이터베이스)
-- [AWS](https://github.com/hyunwoo045/vue3-board/tree/master/docs/aws)
+- [AWS](#AWS)
   - [RDS 서버 생성하기](#RDS-서버-생성하기)
   - [RDS 서버 접속하기](#RDS-인스턴스에-접속해보기)
+  - [mariaDB 한글 입력 오류 해결 방법](#mariaDB-한글-입력-오류-해결-방법)
 
 <br />
 
@@ -390,3 +391,17 @@ MySQL Workbench 에서 접속을 시험해 보겠습니다.
 OK 를 클릭하면 패스워드를 입력하는 창이 뜹니다. 패스워드를 입력하면 정상적으로 DB에 접속하게 됩니다.
 
 ![Access RDS](./images/access_rds_2.png)
+
+<br />
+
+### mariaDB 한글 입력 오류 해결 방법
+
+로컬 DB 환경에서는 잘 되던 한글 입력이 어째서인지 RDS mariaDB 인스턴스에서는 되지 않습니다.
+
+![mariaDB 한글 세팅](./images/mariadb_korean_setting_1.png)
+
+AWS RDS 에서는 DB 를 생성할 때 속성으로 파라미터 그룹을 지정하게 되어 있고, 이 그룹 안에 character-set 도 있습니다. 이 그룹을 default 로 지정하게 되었을 때에 latin... 이 지정되어 한글이 깨지는 현상이 발생합니다.
+
+구글링을 통하여 해결하였습니다.
+
+[AWS mariaDB 한글 세팅](https://twofootdog.tistory.com/62)
