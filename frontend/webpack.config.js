@@ -64,7 +64,7 @@ module.exports = {
   devServer: {
     // host: "localhost",
     proxy: {
-      "/api": "http://3.36.99.250",
+      "/api": "http://localhost:3000",
     },
   },
 };
