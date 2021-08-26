@@ -26,7 +26,7 @@ export default {
     };
   },
   created() {
-    this.$http.get(`http://3.36.99.250/api/content`).then((response) => {
+    this.$http.get(`http://localhost:3000/api/content`).then((response) => {
       console.log(response);
       this.contents = response.data;
     });
