@@ -63,9 +63,5 @@ module.exports = {
 
   devServer: {
     host: "localhost",
-    proxy: {
-      "/api": "http://3.36.99.250",
-      "https://relaxed-hopper-77fa06.netlify.app/api/": "http://3.36.99.250",
-    },
   },
 };
