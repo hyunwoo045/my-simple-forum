@@ -6,13 +6,12 @@
         v-for="(content, idx) in contents"
         :key="idx"
         @click="readContent(content.id)">
-        <span class="content-id">{{ content.id }}</span>
         <span class="content-title">{{ content.title }}</span>
         <span class="content-author">{{ content.author }}</span>
       </div>
     </div>
     <div class="btn-container">
-      <RouterLink :to="{name: 'Add', params: {mode: 'add'}}">
+      <RouterLink :to="{ name: 'Add', params: { mode: 'add' } }">
         <button>글쓰기</button>
       </RouterLink>
     </div>
@@ -24,42 +23,42 @@ export default {
   data() {
     return {
       contents: [],
-    }
+    };
   },
   created() {
-    this.$http.get('/api/content').then((response) => {
-      console.log(response)
+    this.$http.get(`/api/content`).then((response) => {
+      console.log(response);
       this.contents = response.data;
-    })
+    });
   },
   methods: {
     readContent(id) {
-      this.$http.get(`/api/content?id=${id}`).then(response => {
-        let data = response.data[0]
+      this.$http.get(`/api/content?id=${id}`).then((response) => {
+        let data = response.data[0];
         this.$router.push({
-          name: 'Read',
+          name: "Read",
           params: {
             id: data.id,
             title: data.title,
-            description: data.description
-          }
-        })
-      })
-    }
-  }
-}
+            description: data.description,
+          },
+        });
+      });
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
-@import '~/scss/main';
+@import "~/scss/main";
 
 .container {
-  width: 85%;
+  width: 45%;
   height: 75vh;
   .contents {
     height: 70vh;
     .content {
-      height: 40px;
+      height: 75px;
       display: flex;
       align-items: center;
       &:hover {
@@ -72,7 +71,7 @@ export default {
         padding-left: 20px;
       }
       & > span:last-child {
-        border-right: none;  
+        border-right: none;
       }
       .content-id {
         width: 10%;
