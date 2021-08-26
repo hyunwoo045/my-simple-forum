@@ -13,8 +13,8 @@ Vue.js 와 데이터베이스(MySQL), 클라우드 서버(AWS) 학습을 주 목
 - [Frontend](#Frontend)
   - [Vue Router](#Vue-Router)
   - [axios로 API 요청](#axios로-API-요청)
-    - [CORS issue](#CORS-issue)
   - [Webpack Proxy 설정](#Webpack-Proxy-설정)
+  - [CORS issue](#CORS-issue)
 - [Backend](#Backend)
   - [Nodejs MySQL](#Nodejs-MySQL)
   - [Express Generator](#Express-Generator)
@@ -118,23 +118,6 @@ createApp(App).use(VueAxios, axios).mount(#app);
 
 `$http.post()` 메서드의 두번째 인자로 보낼 데이터를 객체 형식으로 지정합니다.
 
-#### CORS issue
-
-로컬 환경의 웹앱과 EC2 인스턴스에 올려둔 API 서버와의 통신, 데이터베이스와의 연결도 모두 확인한 후 Netlify 를 이용하여 간편하게 SPA 형태로 배포하여 다른 컴퓨터에서도 앱을 테스트 해 볼 수 있게 하려 했었다.
-
-하지만 배포 버전에서는 API 호출이 되지 않았다. 에러 메시지는 404.. 그리고 어디로 API호출을 했는지 확인해보니 `https://relaxed-hopper-77fa06.netlify.app/api/content` 이었다. `this.$http.get()` 을 사용할 때에 url에서 host 부분을 생략하였고, 생략된 부분은 `location.origin` 으로 대체되었기 때문일 것이다. 사실 API서버의 host는 `http://3.36.99.250` 임에도 불구하고 로컬 환경에서 `http://localhost:8080/api/content` 가 잘 동작하는 것도 사실은 이상한 일이긴 하다. 어쨌든 완전히 엉뚱한 곳에 API요청을 보내고 있었으니, API서버에 직접 요청을 넣어보았다.
-
-```javascript
-this.$http.get(`http://3.36.99.250/api/content`).then((response) => {
-  console.log(response);
-  this.contents = response.data;
-});
-```
-
-그리고 예상했지만 당연히 에러. 얼마전에 맞닥뜨린 CORS 에러이다.
-
-![CORS issue](./images/cors_issue_1.png)
-
 <br />
 
 ### Webpack Proxy 설정
@@ -177,6 +160,76 @@ module.exports = {
 ```
 
 <br />
+
+### CORS issue
+
+로컬 환경의 웹앱과 EC2 인스턴스에 올려둔 API 서버와의 통신, 데이터베이스와의 연결도 모두 확인한 후 Netlify 를 이용하여 간편하게 SPA 형태로 배포하여 다른 컴퓨터에서도 앱을 테스트 해 볼 수 있게 하려 했었다.
+
+하지만 배포 버전에서는 API 호출이 되지 않았다. 에러 메시지는 404. 그리고 어디로 API호출을 했는지 확인해보니 `https://relaxed-hopper-77fa06.netlify.app/api/content` 이었다. 엉뚱한 URL로 요청을 보내고 있다는 것은 이미 알고 있었다. [Webpack Proxy 설정](#Webpack-Proxy-설정) 파트에서 `/api` 로 시작하는 Path를 가진 URL의 호스트는 `http://3.36.99.250` 로 프록싱 설정을 함으로써, 브라우저는 `localhost:8080/api/content` 로 요청을 보낸 것으로 알고 있지만, 사실은 웹팩이 `http://3.36.99.250` 으로 프록싱하여 마치 CORS 정책을 지킨 것처럼 브라우저를 속이기 때문에 원하는 데이터를 가져올 수 있었다. 하지만 이러한 설정은 어디까지나 개발 환경에서 작동하는 로직이고, 앱을 빌드하고 서버에 올리거나 지금처럼 Netlify를 통해 배포를 한다면 더 이상 `webpack dev-server` 가 동작하지 않기 때문에 프록싱 설정은 날아가버리고 엉뚱한 곳에 API 요청을 보내게 된 것이다.
+
+어지러운 상황이지만 어쨌든 실제 배포 환경에서는 엉뚱한 곳으로 API를 보내고 있다는 것은 명확하다. 물론 너무나도 아주 매우 당연하게도 안되겠지만 모든 URL 을 다 입력해서 요청을 보내보자.
+
+```javascript
+this.$http.get(`http://3.36.99.250/api/content`).then((response) => {
+  console.log(response);
+  this.contents = response.data;
+});
+```
+
+그리고 너무나도 아주 매우 당연한 CORS 정책 위반에 의한 에러
+
+![CORS issue](./images/cors_issue_1.png)
+
+앞으로 자주 볼 문제일 것 같기도 하고 근본적인 해결 방법을 찾기 위해 좋은 글을 찾아 구글링을 하기 시작했고 아래 자료를 찾아 정독!
+
+[CORS는 왜 이렇게 우리를 힘들게 하는걸까?](https://evan-moon.github.io/2020/05/21/about-cors/)
+
+간단히 정리해보자면
+
+- SOP(Same-origin Policy) 라는 '무조건 같은 출처에서만 리소스를 공유할 수 있다'는 규칙을 가진 정책이 있다.
+  - 출처(origin)이란? protocol(ex: http, https), host, port을 모두 합쳐 놓은 것
+  - 예를 들어 `https://moonsdog.com:80/` 와 같이 path 전 까지의 모든 구성을 Origin 이라 한다.
+- 무작정 막기엔 다른 출처의 리소스를 써야하는 경우가 매우 많기 때문에 몇 가지 예외를 둔 것이 CORS(Cross-Origin Resource Sharing).
+- 놀랍게도 출처를 비교하는 로직은 브라우저에 구현되어 있다. CORS 정책을 위반한 요청을 하더라도 서버는 응답을 하고, 브라우저가 이 응답을 분석하여 CORS 위반이라고 판단하면 응답을 버리는 방식이다.
+  - 클라이언트의 요청은 HTTP 프로토콜을 사용하여 보내는데 이 때 `요청 Header` 에 `Origin` 이라는 필드에 출처를 담아 보냄.
+  - 서버가 요청에 대한 처리 후 응답을 할 때에 `응답 Header` 에 `Access-Control-Allow-Origin` 이라는 값에 이 리소스에 접근 가능한 출처의 정보를 브라우저에 보냄
+  - 응답을 받은 브라우저가 `Origin` 과 `Access-Control-Allow-Origin`을 비교하여 유효한지 아닌지 판단함.
+
+더 이상 클라이언트 파트에서 해결하는 것은 어렵다는 것을 깨달았다. 이젠 서버에서 해결을 해보자.
+
+현재 express를 사용하고 있고, cors 라는 확장 패키지를 이용하여 아주 간단히 해결 가능하였다.
+
+```
+$ npm install cors
+```
+
+```javascript
+const cors = require("cors");
+const express = require("express");
+const router = express.Router();
+
+router.get("/", cors(), (req, res) => {
+  res.send("Success!");
+});
+```
+
+위와 같이 특정 라우터에만 cors 를 적용하는 것이 아닌 모든 라우터에 적용하고 싶다면 다른 미들웨어들이 있는 부분에 `app.use(cors())` 를 하면 된다.
+
+그리고 `cors()` 는 모든 요청 오리진을 허용하는 것이며 위험할 수 있으나 일부 주소만 허용하는 것이 좋다
+
+```javascript
+cors({
+  origin: "https://relaxed-hopper-77fa06.netlify.app/#/",
+});
+```
+
+Express 가 아니더라도 간단히 요청 응답 헤더에 `Access-Control-Allow-Origin` 을 설정하면 된다.
+
+```javascript
+res.writeHead(200, {
+  'Access-Control-Allow-Origin': 'https://relaxed-hopper-77fa06.netlify.app/#/'
+})
+```
 
 ---
 
