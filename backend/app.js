@@ -1,5 +1,14 @@
+const whitelist = ["https://relaxed-hopper-77fa06.netlify.app/#/"];
+const corsOption = {
+  origin: function (origin, callback) {
+    var isWhiteListed = whitelist.indexOf(origin) !== 1;
+    callback(null, isWhiteListed);
+  },
+  credentials: true,
+};
+
 var createError = require("http-errors");
-var cors = require("cors")();
+var cors = require("cors")(corsOption);
 var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
