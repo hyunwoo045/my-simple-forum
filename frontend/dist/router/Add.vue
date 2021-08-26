@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import defaultAPI from '~/core/defaultAPI';
 export default {
   name: 'Add',
   props: {
@@ -73,9 +74,9 @@ export default {
     createHandler() {
       let url = ''
       if (this.mode === 'modify') {
-        url = '/api/content/modify'
+        url = `${defaultAPI.end_point}/content/modify`
       } else {
-        url = '/api/content/create'
+        url = `${defaultAPI.end_point}/content/create`
       }
 
       this.$http.post(url, {
@@ -98,8 +99,6 @@ export default {
 .container {
   padding: 20px 20px;
   box-sizing: border-box;
-  width: 85%;
-  height: 75vh;
   .input-area {
     margin-bottom: 8px;
     // &:last-child {

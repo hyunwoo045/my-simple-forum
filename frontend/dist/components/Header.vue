@@ -3,7 +3,7 @@
     <RouterLink
       to="/"
       class="logo">
-      LOGO
+      HOME
     </RouterLink>
   </header>
 </template>
@@ -17,10 +17,9 @@ export default {
 <style lang="scss" scoped>
 header {
   height: 75px;
-  padding: 0 50px;
+  padding: 0 200px;
   display: flex;
   align-items: center;
-  background-color: orange;
   .logo {
     text-decoration: none;
   }

@@ -1,13 +1,30 @@
 <template>
   <div class="container">
     <div class="contents">
-      <div
+      <!-- <div
         class="content"
         v-for="(content, idx) in contents"
         :key="idx"
         @click="readContent(content.id)">
         <span class="content-title">{{ content.title }}</span>
         <span class="content-author">{{ content.author }}</span>
+      </div> -->
+      <div
+        class="content"
+        v-for="(content, contentIndex) in contents"
+        :key="contentIndex"
+        @click="readContent(content.id)">
+        <div class="content-top">
+          {{ content.title }}
+        </div>
+        <div class="content-bottom">
+          <div class="content-bottom author">
+            {{ content.author }}
+          </div>
+          <div class="content-bottom created">
+            {{ content.created.split('T')[0] }}
+          </div>
+        </div>
       </div>
     </div>
     <div class="btn-container">
@@ -19,6 +36,7 @@
 </template>
 
 <script>
+import defaultAPI from '~/core/defaultAPI'
 export default {
   data() {
     return {
@@ -26,14 +44,14 @@ export default {
     };
   },
   created() {
-    this.$http.get(`http://3.36.99.250/api/content`).then((response) => {
+    this.$http.get(`${defaultAPI.end_point}/content`).then((response) => {
       console.log(response);
       this.contents = response.data;
     });
   },
   methods: {
     readContent(id) {
-      this.$http.get(`/api/content?id=${id}`).then((response) => {
+      this.$http.get(`${defaultAPI.end_point}/content?id=${id}`).then((response) => {
         let data = response.data[0];
         this.$router.push({
           name: "Read",
@@ -51,45 +69,36 @@ export default {
 
 <style lang="scss" scoped>
 @import "~/scss/main";
-
 .container {
-  width: 45%;
   height: 75vh;
-  .contents {
-    height: 70vh;
-    .content {
-      height: 75px;
-      display: flex;
-      align-items: center;
-      &:hover {
-        background-color: rgb(218, 218, 218);
-      }
-      & > span {
-        display: inline-block;
-        border-right: 1px solid #000;
-        box-sizing: border-box;
-        padding-left: 20px;
-      }
-      & > span:last-child {
-        border-right: none;
-      }
-      .content-id {
-        width: 10%;
-      }
-      .content-title {
-        width: 70%;
-        text-align: left;
-      }
-      .content-author {
-        width: 20%;
-      }
-    }
+}
+.content {
+  height: 70px;
+  padding: 0 30px;
+  &:hover {
+    background-color: rgb(189, 189, 189);
   }
-  .btn-container {
-    width: 100%;
-    height: 10vh;
+  .content-top {
     display: flex;
     align-items: center;
+    height: 50%;
   }
+  .content-bottom {
+    height: 50%;
+    display: flex;
+    &.author {
+      width: 300px;
+      font-size: 14px;
+    }
+    &.created {
+      font-size: 11px;
+    }
+  }
+}
+.btn-container {
+  width: 100%;
+  height: 10vh;
+  display: flex;
+  align-items: center;
 }
 </style>

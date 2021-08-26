@@ -1,24 +1,44 @@
 <template>
-  <div class="container">
-    <div class="button-area">
+  <div class="content-detail">
+    <div class="container">
+      <div class="content-area">
+        <div class="read-title">
+          {{ $route.params.title }}
+        </div>
+        <div class="read-description">
+          {{ $route.params.description }}
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="content-detail comment-area">
+        <div class="content-detail comment-area label">
+          댓글
+        </div>
+
+        <div class="content-detail comment-area inputs">
+          <div class="comment-write">
+            <textarea
+              class="comment-write-inner"></textarea>
+          </div>
+          <button>작성</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <div class="button-area">
       <button @click="modifyHandler">
         수정
       </button>
       <button @click="deleteHandler">
         삭제
       </button>
-    </div>
+    </div> -->
     
-    <div class="content-area">
-      <div class="read-title">
-        {{ $route.params.title }}
-      </div>
-      <div class="read-description">
-        {{ $route.params.description }}
-      </div>
-    </div>
 
-    <div class="comments-area">
+
+  <!-- <div class="comments-area">
       <div class="comments-area label">
         댓글
       </div>
@@ -59,16 +79,15 @@
           댓글 쓰기
         </button>
       </div>
-      <!-- 댓글 쓰기 -->
-    </div>
-  </div>
+    </div> -->
 </template>
 
 <script>
+import defaultAPI from '~/core/defaultAPI'
 export default {
   created() {
     /* LOAD COMMENTS */
-    this.$http.get(`/api/comment?id=${this.$route.params.id}`).then(response => {
+    this.$http.get(`${defaultAPI.end_point}/comment?id=${this.$route.params.id}`).then(response => {
       console.log('READ', response)
       this.comments = response.data;
     })
@@ -98,13 +117,13 @@ export default {
     },
     async deleteHandler() {
       let id = this.$route.params.id;
-      await this.$http.post('/api/content/delete', { id }).then(response => {
+      await this.$http.post(`${defaultAPI.end_point}/content/delete`, { id }).then(response => {
         console.log(response)
       })
       this.$router.push('/')
     },
     addComment() {
-      this.$http.post('/api/comment/create', {
+      this.$http.post(`${defaultAPI.end_point}/comment/create`, {
         author: this.commentAuthor,
         description: this.commentDescription,
         content_id: this.$route.params.id
@@ -112,7 +131,7 @@ export default {
         console.log(response)
       });
       
-      this.$http.get(`/api/comment?id=${this.$route.params.id}`)
+      this.$http.get(`${defaultAPI.end_point}/comment?id=${this.$route.params.id}`)
       .then(response => {
         console.log('READ', response)
         this.comments = response.data;
@@ -123,13 +142,13 @@ export default {
     },
     commentDelete(id) {
       console.log(id, '댓글 삭제')
-      this.$http.post('/api/comment/delete', {
+      this.$http.post(`${defaultAPI.end_point}/comment/delete`, {
         id
       }).then(response => {
         console.log(response);
       });
 
-      this.$http.get(`/api/comment?id=${this.$route.params.id}`)
+      this.$http.get(`${defaultAPI.end_point}/comment?id=${this.$route.params.id}`)
       .then(response => {
         console.log('READ', response)
         this.comments = response.data;
@@ -142,34 +161,33 @@ export default {
 <style lang="scss">
 @import '~/scss/main';
 .container {
-  width: 85%;
-  height: 75vh;
-  .content-area {
-    padding: 0 10px;
-    .read-title {
-      height: 75px;
-      display: flex;
-      align-items: center;
-    }
-    .read-description {
-      height: 300px;
-      white-space: pre-line;
-    }
+  margin-bottom: 30px;
+}
+
+.comment-area {
+  &.label {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    font-size: 20px;
   }
-  
-  button {
-    margin-right: 5px;
-  }
-  .comments-area {
-    .comments-area.comments {
-      .comment {
-        display: flex;
-        &.author {
-          width: 100px;
-        }
-        &.description {
-          width: 500px;
-        }
+  &.inputs {
+    background-color: rgb(236, 236, 236);
+    box-sizing: border-box;
+    .comment-write {
+      padding: 10px 0;
+      height: 200px;
+      position: relative;
+      textarea {
+        width: 100%;
+        height: 80%;
+        font-size: 14px;
+        font-family: Helvetica,Arial, Malgun Gothic, sans-serif;
+      }
+      button {
+        position: relative;
+        right: 0;
+        top: 0;
       }
     }
   }
