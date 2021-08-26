@@ -13,6 +13,7 @@ Vue.js 와 데이터베이스(MySQL), 클라우드 서버(AWS) 학습을 주 목
 - [Frontend](#Frontend)
   - [Vue Router](#Vue-Router)
   - [axios로 API 요청](#axios로-API-요청)
+    - [CORS issue](#CORS-issue)
   - [Webpack Proxy 설정](#Webpack-Proxy-설정)
 - [Backend](#Backend)
   - [Nodejs MySQL](#Nodejs-MySQL)
@@ -28,12 +29,10 @@ Vue.js 와 데이터베이스(MySQL), 클라우드 서버(AWS) 학습을 주 목
 
 ## 목표
 
-### 8월 25일
+### 8월 26일
 
-- AWS RDS
-  - 데이터베이스 서버 구축
-  - 원격 API 요청에 대한 데이터 응답
-- 백엔드 코드 리팩토링
+- frontend style 작업
+- CORS 에러 해결
 
 ---
 
@@ -119,6 +118,23 @@ createApp(App).use(VueAxios, axios).mount(#app);
 
 `$http.post()` 메서드의 두번째 인자로 보낼 데이터를 객체 형식으로 지정합니다.
 
+#### CORS issue
+
+로컬 환경의 웹앱과 EC2 인스턴스에 올려둔 API 서버와의 통신, 데이터베이스와의 연결도 모두 확인한 후 Netlify 를 이용하여 간편하게 SPA 형태로 배포하여 다른 컴퓨터에서도 앱을 테스트 해 볼 수 있게 하려 했었다.
+
+하지만 배포 버전에서는 API 호출이 되지 않았다. 에러 메시지는 404.. 그리고 어디로 API호출을 했는지 확인해보니 `https://relaxed-hopper-77fa06.netlify.app/api/content` 이었다. `this.$http.get()` 을 사용할 때에 url에서 host 부분을 생략하였고, 생략된 부분은 `location.origin` 으로 대체되었기 때문일 것이다. 사실 API서버의 host는 `http://3.36.99.250` 임에도 불구하고 로컬 환경에서 `http://localhost:8080/api/content` 가 잘 동작하는 것도 사실은 이상한 일이긴 하다. 어쨌든 완전히 엉뚱한 곳에 API요청을 보내고 있었으니, API서버에 직접 요청을 넣어보았다.
+
+```javascript
+this.$http.get(`http://3.36.99.250/api/content`).then((response) => {
+  console.log(response);
+  this.contents = response.data;
+});
+```
+
+그리고 예상했지만 당연히 에러. 얼마전에 맞닥뜨린 CORS 에러이다.
+
+![CORS issue](./images/cors_issue_1.png)
+
 <br />
 
 ### Webpack Proxy 설정
@@ -132,7 +148,7 @@ module.exports = {
   // ....
   devServer: {
     proxy: {
-      "/api": "http://localhost:3000",
+      "/api": "http://3.36.99.250",
     },
   },
 };
