@@ -1,4 +1,4 @@
-const whitelist = ["https://relaxed-hopper-77fa06.netlify.app/#/"];
+const whitelist = ["*"];
 const corsOption = {
   origin: function (origin, callback) {
     var isWhiteListed = whitelist.indexOf(origin) !== 1;
