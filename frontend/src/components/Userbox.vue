@@ -43,7 +43,6 @@
 </template>
 
 <script>
-import defaultAPI from '~/core/defaultAPI'
 export default {
   created() {
     this.curName = this.$store.state.user.username;
@@ -69,23 +68,17 @@ export default {
       this.toggler = !this.toggler;
     },
     searchMyContents() {
-      this.$http.get(`${defaultAPI.end_point}/content/get_by_author?author=${this.$store.state.user.username}`).then(response => {
-        this.$store.commit('user/setContents', {
-          contents: response.data,
-        });
-        this.$router.push('/');
-      })
+      this.$router.push({
+        name: "Home",
+        query: {
+          author: this.$store.state.user.username,
+        }
+      });
     },
     searchAllContents() {
-      this.$http.get(`${defaultAPI.end_point}/content`).then(response => {
-        this.$store.commit('user/setContents', {
-          contents: response.data,
-        });
-        this.$router.push('/');
-      })
+      this.$router.push('/')
     }
   }
-  
 }
 </script>
 

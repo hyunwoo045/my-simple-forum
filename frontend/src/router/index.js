@@ -10,6 +10,7 @@ export default createRouter({
     {
       path: "/",
       component: Container,
+      name: "Home",
     },
     {
       path: "/add",

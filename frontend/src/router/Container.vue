@@ -32,17 +32,21 @@
 <script>
 import defaultAPI from '~/core/defaultAPI'
 export default {
-  computed: {
-    contents() {
-      return this.$store.state.user.contents;
+  data() {
+    return {
+      contents: [],
     }
   },
   created() {
-    this.$http.get(`${defaultAPI.end_point}/content`).then((response) => {
-      this.$store.commit('user/setContents', {
-        contents: response.data,
-      })
-    });
+    if (this.$route.query.author === undefined) {
+      this.$http.get(`${defaultAPI.end_point}/content`).then((response) => {
+        this.contents = response.data;
+      });
+    } else {
+      this.$http.get(`${defaultAPI.end_point}/content/get_by_author?author=${this.$route.query.author}`).then(response => {
+        this.contents = response.data;
+      });
+    }
   },
   methods: {
     readContent(id) {
