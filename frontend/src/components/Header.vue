@@ -3,7 +3,8 @@
     <RouterLink
       to="/"
       class="logo">
-      HOME
+      MY-SIMPLE-<span class="highlight">FORUM<span>
+      </span></span>
     </RouterLink>
   </header>
 </template>
@@ -21,7 +22,13 @@ header {
   display: flex;
   align-items: center;
   .logo {
+    margin: 0 auto;
     text-decoration: none;
+    font-family: 'Oswald', sans-serif;
+    font-size: 21px;
+    .highlight {
+      color: rgb(214, 129, 0);
+    }
   }
 }
 </style>
