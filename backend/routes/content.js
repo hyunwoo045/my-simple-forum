@@ -29,6 +29,7 @@ router.get("/", (req, res) => {
       [id],
       (err, topics) => {
         if (err) throw err;
+        connection.end();
         res.send(topics);
       }
     );
@@ -51,6 +52,7 @@ router.post("/create", function (req, res) {
     [title, description, author],
     (err) => {
       if (err) throw err;
+      connection.end();
       res.send("INSERTED");
     }
   );
@@ -60,7 +62,6 @@ router.post("/create", function (req, res) {
 /* /api/content/modify */
 router.post("/modify", function (req, res) {
   let id = String(req.body.id);
-  let author = req.body.author;
   let title = req.body.title;
   let description = req.body.description;
 
@@ -72,6 +73,7 @@ router.post("/modify", function (req, res) {
     [title, description, id],
     (err) => {
       if (err) throw err;
+      connection.end();
       res.send("UPDATED");
     }
   );
@@ -86,21 +88,23 @@ router.post("/delete", function (req, res) {
 
   connection.query(`DELETE FROM contents WHERE id=?`, [id], (err) => {
     if (err) throw err;
+    connection.end();
     res.send("Delete Completed");
   });
 });
 
-router.get("/get-by-author", function (req, res) {
+router.get("/get_by_author", function (req, res) {
   const _url = req.url;
   const queryData = url.parse(_url, true).query;
   const author = queryData.author;
-
+  console.log(author);
   let connection = mysql.createConnection(dbConfig);
   connection.query(
     `SELECT * FROM contents WHERE author=? ORDER BY created DESC`,
     [author],
     (err, contents) => {
-      if (erro) throw err;
+      if (err) throw err;
+      connection.end();
       res.send(contents);
     }
   );

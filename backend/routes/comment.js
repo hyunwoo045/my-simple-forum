@@ -21,6 +21,7 @@ router.get("/", (req, res) => {
     [id],
     (err, comments) => {
       if (err) throw err;
+      connection.end();
       res.send(comments);
     }
   );
@@ -40,6 +41,7 @@ router.post("/create", (req, res) => {
     [author, description, content_id],
     (err) => {
       if (err) throw err;
+      connection.end();
       res.send("Comment Added");
     }
   );
@@ -60,6 +62,7 @@ router.post("/modify", (req, res) => {
     [author, description, id],
     (err) => {
       if (err) throw err;
+      connection.end();
       res.send("COMMENT UPDATED");
     }
   );
@@ -74,6 +77,7 @@ router.post("/delete", (req, res) => {
   let id = req.body.id;
   connection.query("DELETE FROM comments WHERE id=?", [id], (err) => {
     if (err) throw err;
+    connection.end();
     res.send("COMMENT DELETED");
   });
 });

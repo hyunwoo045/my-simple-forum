@@ -27,7 +27,9 @@
         :to="{ name: 'Add', params: { mode: 'add' } }">
         글쓰기
       </RouterLink>
-      <div class="btn search-my">
+      <div
+        class="btn search-my"
+        @click="searchMyContents">
         내가 쓴 글
       </div>
     </div>
@@ -35,6 +37,7 @@
 </template>
 
 <script>
+import defaultAPI from '~/core/defaultAPI'
 export default {
   created() {
     this.curName = this.$store.state.user.username;
@@ -58,6 +61,13 @@ export default {
         });
       }
       this.toggler = !this.toggler;
+    },
+    searchMyContents() {
+      this.$http.get(`${defaultAPI.end_point}/get-by-author?author=${this.$store.state.user.username}`).then(response => {
+        this.$store.commit('user/setContents', {
+          contents: response.data,
+        })
+      })
     }
   }
   

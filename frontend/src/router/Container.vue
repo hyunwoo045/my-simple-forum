@@ -35,14 +35,16 @@
 <script>
 import defaultAPI from '~/core/defaultAPI'
 export default {
-  data() {
-    return {
-      contents: [],
-    };
+  computed: {
+    contents() {
+      return this.$store.state.user.contents;
+    }
   },
   created() {
     this.$http.get(`${defaultAPI.end_point}/content`).then((response) => {
-      this.contents = response.data;
+      this.$store.commit('user/setContents', {
+        contents: response.data,
+      })
     });
   },
   methods: {
