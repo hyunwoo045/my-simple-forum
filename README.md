@@ -12,6 +12,7 @@ Vue.js 와 데이터베이스(MySQL), 클라우드 서버(AWS) 학습을 주 목
 
 - [Frontend](#Frontend)
   - [Vue Router](#Vue-Router)
+  - [Vuex](#Vuex)
   - [axios로 API 요청](#axios로-API-요청)
   - [Webpack Proxy 설정](#Webpack-Proxy-설정)
   - [CORS issue](#CORS-issue)
@@ -41,6 +42,38 @@ Vue.js 와 데이터베이스(MySQL), 클라우드 서버(AWS) 학습을 주 목
 ### Vue Router
 
 문서 작업 예정
+
+### Vuex
+
+유저 이름을 어느 컴포넌트에서든 쉽게 사용할 수 있도록 Vue의 중앙 집중식 저장소 Vuex를 사용하겠습니다.
+
+설치
+
+```
+$ npm i vuex@next
+```
+
+`src` 디렉토리 `store` 폴더를 하나 생성하고 `index.js`를 생성합니다. <br />
+
+```javascript
+import { createStore } from "vuex";
+
+export default createStore({
+  // Movie, About 등의 데이터 타입들이 module 에 연결된다.
+  modules: {},
+});
+```
+
+그리고 `main.js` 에 이 store를 사용하겠다고 선언해줍니다.
+
+```javascript
+import { createApp } from "vue";
+import App from "./App";
+import router from "./routes/index.js";
+import store from "./sotre/index.js";
+
+createApp(App).use(router).use(store).mount("#app");
+```
 
 <br />
 
@@ -227,8 +260,8 @@ Express 가 아니더라도 간단히 요청 응답 헤더에 `Access-Control-Al
 
 ```javascript
 res.writeHead(200, {
-  'Access-Control-Allow-Origin': 'https://relaxed-hopper-77fa06.netlify.app/#/'
-})
+  "Access-Control-Allow-Origin": "https://relaxed-hopper-77fa06.netlify.app/#/",
+});
 ```
 
 ---
