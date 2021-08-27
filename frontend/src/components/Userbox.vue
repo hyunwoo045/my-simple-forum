@@ -12,7 +12,8 @@
         <input
           type="text"
           maxlength="11"
-          v-model="curName" />
+          v-model="curName"
+          @keyup.enter="toggleUsername" />
       </div>
       <div
         class="change-username"
@@ -31,6 +32,11 @@
         class="btn search-my"
         @click="searchMyContents">
         내가 쓴 글
+      </div>
+      <div
+        class="btn search-all"
+        @click="searchAllContents">
+        전체 글
       </div>
     </div>
   </div>
@@ -63,10 +69,19 @@ export default {
       this.toggler = !this.toggler;
     },
     searchMyContents() {
-      this.$http.get(`${defaultAPI.end_point}/get-by-author?author=${this.$store.state.user.username}`).then(response => {
+      this.$http.get(`${defaultAPI.end_point}/content/get_by_author?author=${this.$store.state.user.username}`).then(response => {
         this.$store.commit('user/setContents', {
           contents: response.data,
-        })
+        });
+        this.$router.push('/');
+      })
+    },
+    searchAllContents() {
+      this.$http.get(`${defaultAPI.end_point}/content`).then(response => {
+        this.$store.commit('user/setContents', {
+          contents: response.data,
+        });
+        this.$router.push('/');
       })
     }
   }
@@ -87,10 +102,10 @@ export default {
     display: flex;
     align-items: center;
     .username {
-      padding: 0 8px;
+      padding: 0 20px;
       font-size: 19px;
-      width: 140px;
-      margin-right: 30px;
+      width: 190px;
+      box-sizing: border-box;
       &.change {
         input {
           height: 25px;
@@ -116,8 +131,13 @@ export default {
       align-items: center;
       width: 90px;
       height: 40px;
-      margin-right: 30px;
       cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      margin-right: 4px;
+      &:last-child {
+        margin: 0;
+      }
       &.write {
         background-color: rgb(0, 165, 0);
         color: white;
