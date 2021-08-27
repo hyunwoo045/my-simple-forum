@@ -5,7 +5,7 @@
     </header>
     <section>
       <Userbox />
-      <RouterView />
+      <RouterView :key="$route.fullPath" />
     </section>
   </div>
 </template>

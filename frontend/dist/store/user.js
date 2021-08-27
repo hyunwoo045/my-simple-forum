@@ -1,1 +1,1 @@
-export default{namespaced:!0,state:()=>({username:"Guest"}),mutations:{setUsername(e,a){e.username=a.newName}}};
+export default{namespaced:!0,state:()=>({username:"Guest",contents:[]}),mutations:{setUsername(e,t){e.username=t.newName},setContents(e,t){e.contents=t.contents}}};

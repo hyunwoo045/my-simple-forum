@@ -5,9 +5,6 @@
         <div class="board-label">
           게시판
         </div>
-        <div class="search">
-          <input type="text" />
-        </div>
       </div>
       <div
         class="content"
@@ -38,12 +35,18 @@ export default {
   data() {
     return {
       contents: [],
-    };
+    }
   },
   created() {
-    this.$http.get(`${defaultAPI.end_point}/content`).then((response) => {
-      this.contents = response.data;
-    });
+    if (this.$route.query.author === undefined) {
+      this.$http.get(`${defaultAPI.end_point}/content`).then((response) => {
+        this.contents = response.data;
+      });
+    } else {
+      this.$http.get(`${defaultAPI.end_point}/content/get_by_author?author=${this.$route.query.author}`).then(response => {
+        this.contents = response.data;
+      });
+    }
   },
   methods: {
     readContent(id) {
@@ -51,11 +54,11 @@ export default {
         let data = response.data[0];
         this.$router.push({
           name: "Read",
-          params: {
+          query: {
             id: data.id,
-            author: data.author,
-            title: data.title,
-            description: data.description,
+            // author: data.author,
+            // title: data.title,
+            // description: data.description,
           },
         });
       });
@@ -67,8 +70,8 @@ export default {
 <style lang="scss" scoped>
 @import "~/scss/main";
 .contents-toplabel {
-  height: 100px;
-  background-color: rgb(170, 170, 170);
+  height: 70px;
+  border-bottom: 1px solid gray;
   position: relative;
   .board-label {
     height: 60px;
@@ -77,10 +80,6 @@ export default {
     padding: 0 30px;
     font-weight: 700;
     font-size: 24px;
-  }
-  .search {
-    position: absolute;
-    right: 10px;
   }
 }
 .content {

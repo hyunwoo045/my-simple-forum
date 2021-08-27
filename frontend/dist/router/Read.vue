@@ -3,10 +3,10 @@
     <div class="container">
       <div class="content-area-top">
         <div class="title">
-          {{ $route.params.title }}
+          {{ contentTitle }}
         </div>
         <div class="author">
-          작성자: {{ $route.params.author }}
+          작성자: {{ contentAuthor }}
         </div>
         <div class="links">
           <span @click="modifyHandler">수정</span>
@@ -15,7 +15,7 @@
       </div>
       <div class="content-area-bottom">
         <div class="description">
-          {{ $route.params.description }}
+          {{ contentDescription }}
         </div>
       </div>
     </div>
@@ -78,13 +78,24 @@
 import defaultAPI from '~/core/defaultAPI'
 export default {
   created() {
-    /* LOAD COMMENTS */
-    this.$http.get(`${defaultAPI.end_point}/comment?id=${this.$route.params.id}`).then(response => {
-      this.comments = response.data;
-    })
+    this.contentId = this.$route.query.id;
+    this.$http.get(`${defaultAPI.end_point}/content?id=${this.$route.query.id}`)
+    .then(response => {
+      this.contentTitle = response.data[0].title;
+      this.contentDescription = response.data[0].description;
+      this.contentAuthor = response.data[0].author;
+      this.$http.get(`${defaultAPI.end_point}/comment?id=${this.$route.query.id}`)
+      .then(response => {
+        this.comments = response.data;
+      });
+    });    
   },
   data() {
     return {
+      contentId: -1,
+      contentTitle: '',
+      contentDescription: '',
+      contentAuthor: '',
       curCommentIdx: -1,
       comments: [],
       commentDescription: '',
@@ -92,23 +103,18 @@ export default {
   },
   methods: {
     modifyHandler() {
-      let id = this.$route.params.id;
-      let title = this.$route.params.title;
-      let description = this.$route.params.description;
-
       this.$router.push({
         name: 'Add',
         params: {
           mode: 'modify',
-          contentId: id,
-          title,
-          description,
+          contentId: this.contentId,
+          title: this.contentTitle,
+          description: this.contentDescription,
         },
       })
     },
     async deleteHandler() {
-      let id = this.$route.params.id;
-      await this.$http.post(`${defaultAPI.end_point}/content/delete`, { id }).then(() => {
+      await this.$http.post(`${defaultAPI.end_point}/content/delete`, { id: this.contentId }).then(() => {
         this.$router.push('/')
       })
     },
@@ -117,9 +123,9 @@ export default {
       this.$http.post(`${defaultAPI.end_point}/comment/create`, {
         author: this.$store.state.user.username,
         description: this.commentDescription,
-        content_id: this.$route.params.id
+        content_id: this.contentId
       }).then(() => {
-        this.$http.get(`${defaultAPI.end_point}/comment?id=${this.$route.params.id}`)
+        this.$http.get(`${defaultAPI.end_point}/comment?id=${this.contentId}`)
         .then(response => {
           this.comments = response.data;
         });
@@ -130,7 +136,7 @@ export default {
       this.$http.post(`${defaultAPI.end_point}/comment/delete`, {
         id
       }).then(() => {
-        this.$http.get(`${defaultAPI.end_point}/comment?id=${this.$route.params.id}`)
+        this.$http.get(`${defaultAPI.end_point}/comment?id=${this.contentId}`)
         .then((response) => {
           this.comments = response.data;
         })
