@@ -1,21 +1,23 @@
 <template>
   <div class="container">
     <div class="contents">
-      <!-- <div
-        class="content"
-        v-for="(content, idx) in contents"
-        :key="idx"
-        @click="readContent(content.id)">
-        <span class="content-title">{{ content.title }}</span>
-        <span class="content-author">{{ content.author }}</span>
-      </div> -->
+      <div class="contents-toplabel">
+        <div class="board-label">
+          게시판
+        </div>
+        <div class="search">
+          <input type="text" />
+        </div>
+      </div>
       <div
         class="content"
         v-for="(content, contentIndex) in contents"
         :key="contentIndex"
         @click="readContent(content.id)">
         <div class="content-top">
-          {{ content.title }}
+          <div class="title">
+            {{ content.title }}
+          </div>
         </div>
         <div class="content-bottom">
           <div class="content-bottom author">
@@ -26,11 +28,6 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="btn-container">
-      <RouterLink :to="{ name: 'Add', params: { mode: 'add' } }">
-        <button>글쓰기</button>
-      </RouterLink>
     </div>
   </div>
 </template>
@@ -45,7 +42,6 @@ export default {
   },
   created() {
     this.$http.get(`${defaultAPI.end_point}/content`).then((response) => {
-      console.log(response);
       this.contents = response.data;
     });
   },
@@ -57,6 +53,7 @@ export default {
           name: "Read",
           params: {
             id: data.id,
+            author: data.author,
             title: data.title,
             description: data.description,
           },
@@ -69,8 +66,22 @@ export default {
 
 <style lang="scss" scoped>
 @import "~/scss/main";
-.container {
-  height: 75vh;
+.contents-toplabel {
+  height: 100px;
+  background-color: rgb(170, 170, 170);
+  position: relative;
+  .board-label {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding: 0 30px;
+    font-weight: 700;
+    font-size: 24px;
+  }
+  .search {
+    position: absolute;
+    right: 10px;
+  }
 }
 .content {
   height: 70px;
@@ -82,10 +93,16 @@ export default {
     display: flex;
     align-items: center;
     height: 50%;
+    .title {
+      padding-top: 10px;
+      font-size: 17px;
+      font-weight: 600;
+    }
   }
   .content-bottom {
     height: 50%;
     display: flex;
+    padding: 4px 0;
     &.author {
       width: 300px;
       font-size: 14px;
