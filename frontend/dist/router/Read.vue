@@ -1,85 +1,77 @@
 <template>
   <div class="content-detail">
     <div class="container">
-      <div class="content-area">
-        <div class="read-title">
+      <div class="content-area-top">
+        <div class="title">
           {{ $route.params.title }}
         </div>
-        <div class="read-description">
+        <div class="author">
+          작성자: {{ $route.params.author }}
+        </div>
+        <div class="links">
+          <span @click="modifyHandler">수정</span>
+          <span @click="deleteHandler">삭제</span>
+        </div>
+      </div>
+      <div class="content-area-bottom">
+        <div class="description">
           {{ $route.params.description }}
         </div>
       </div>
     </div>
 
     <div class="container">
-      <div class="content-detail comment-area">
-        <div class="content-detail comment-area label">
+      <div class="comment-area">
+        <div class="comment-area label">
           댓글
         </div>
 
-        <div class="content-detail comment-area inputs">
+        <div class="comment-area inputs">
           <div class="comment-write">
             <textarea
-              class="comment-write-inner"></textarea>
+              class="comment-write-inner"
+              placeholder="댓글을 입력하세요."
+              v-model="commentDescription"></textarea>
           </div>
-          <button>작성</button>
+          <button
+            class="comment-submit"
+            @click="addComment">
+            작성
+          </button>
+        </div>
+
+        <div class="comment-area comments">
+          <div
+            class="comment"
+            v-for="(comment, commentIdx) in comments"
+            :key="commentIdx"
+            @mouseenter="setCurrentCommentIndex(commentIdx)"
+            @mouseleave="setCurrentCommentIndex(-1)">
+            <div class="comment top">
+              <div class="comment-author">
+                {{ comment.author }}
+              </div>
+              <div class="comment-created">
+                {{ comment.created.split("T")[0] }}
+              </div>
+            </div>
+            
+            <div class="comment bottom">
+              <div class="description">
+                {{ comment.description }}
+              </div>
+              <div
+                class="comment-delete"
+                @click="commentDelete(comment.id)"
+                v-if="curCommentIdx === commentIdx">
+                삭제
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-  <!-- <div class="button-area">
-      <button @click="modifyHandler">
-        수정
-      </button>
-      <button @click="deleteHandler">
-        삭제
-      </button>
-    </div> -->
-    
-
-
-  <!-- <div class="comments-area">
-      <div class="comments-area label">
-        댓글
-      </div>
-      <div class="comments-area comments">
-        <div
-          class="comment"
-          v-for="(comment, idx) in comments"
-          :key="idx">
-          <div class="comment author">
-            {{ comment.author }}
-          </div>
-          <div class="comment description">
-            {{ comment.description }}
-          </div>
-          <div class="comment modify">
-            <button @click="commentModify(comment.id)">
-              수정
-            </button>
-          </div>
-          <div class="comment delete">
-            <button @click="commentDelete(comment.id)">
-              삭제
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="comments-area input-comments">
-        <input
-          type="text"
-          placeholder="작성자"
-          v-model="commentAuthor" />
-        <input
-          type="text"
-          v-model="commentDescription"
-          placeholder="내용" />
-        <button @click="addComment">
-          댓글 쓰기
-        </button>
-      </div>
-    </div> -->
 </template>
 
 <script>
@@ -88,14 +80,13 @@ export default {
   created() {
     /* LOAD COMMENTS */
     this.$http.get(`${defaultAPI.end_point}/comment?id=${this.$route.params.id}`).then(response => {
-      console.log('READ', response)
       this.comments = response.data;
     })
   },
   data() {
     return {
+      curCommentIdx: -1,
       comments: [],
-      commentAuthor: '',
       commentDescription: '',
     }
   },
@@ -117,42 +108,38 @@ export default {
     },
     async deleteHandler() {
       let id = this.$route.params.id;
-      await this.$http.post(`${defaultAPI.end_point}/content/delete`, { id }).then(response => {
-        console.log(response)
+      await this.$http.post(`${defaultAPI.end_point}/content/delete`, { id }).then(() => {
+        this.$router.push('/')
       })
-      this.$router.push('/')
     },
+
     addComment() {
       this.$http.post(`${defaultAPI.end_point}/comment/create`, {
-        author: this.commentAuthor,
+        author: this.$store.state.user.username,
         description: this.commentDescription,
         content_id: this.$route.params.id
-      }).then(response => {
-        console.log(response)
+      }).then(() => {
+        this.$http.get(`${defaultAPI.end_point}/comment?id=${this.$route.params.id}`)
+        .then(response => {
+          this.comments = response.data;
+        });
+        this.commentDescription = '';
       });
-      
-      this.$http.get(`${defaultAPI.end_point}/comment?id=${this.$route.params.id}`)
-      .then(response => {
-        console.log('READ', response)
-        this.comments = response.data;
-      })
-    },
-    commentModify(id) {
-      console.log(id, '댓글 수정')
     },
     commentDelete(id) {
-      console.log(id, '댓글 삭제')
       this.$http.post(`${defaultAPI.end_point}/comment/delete`, {
         id
-      }).then(response => {
-        console.log(response);
+      }).then(() => {
+        this.$http.get(`${defaultAPI.end_point}/comment?id=${this.$route.params.id}`)
+        .then((response) => {
+          this.comments = response.data;
+        })
       });
 
-      this.$http.get(`${defaultAPI.end_point}/comment?id=${this.$route.params.id}`)
-      .then(response => {
-        console.log('READ', response)
-        this.comments = response.data;
-      })
+
+    },
+    setCurrentCommentIndex(idx) {
+      this.curCommentIdx = idx;
     }
   }
 }
@@ -163,31 +150,115 @@ export default {
 .container {
   margin-bottom: 30px;
 }
+.content-area-top {
+  height: 110px;
+  padding: 10px 20px;
+  border-bottom: 1px solid gray;
+  .title {
+    padding: 8px 0;
+    font-size: 23px;
+    font-weight: 700;
+    height: 42px;
+  }
+  .author {
+    height: 34px;
+    font-size: 14px;
+  }
+  .links {
+    font-size: 14px;
+    & > span {
+      margin-right: 25px;
+      cursor: pointer;
+    }
+    & > span:last-child {
+      margin: 0;
+      color: red;
+    }
+  }
+}
+.content-area-bottom {
+  padding: 30px 20px;
+
+  .description {
+    white-space: pre-line;
+  }
+}
 
 .comment-area {
   &.label {
+    width: 100%;
     height: 60px;
     display: flex;
     align-items: center;
     font-size: 20px;
+    padding: 0 20px;
   }
   &.inputs {
-    background-color: rgb(236, 236, 236);
+    background-color: rgb(210, 210, 210);
     box-sizing: border-box;
+    position: relative;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     .comment-write {
-      padding: 10px 0;
-      height: 200px;
-      position: relative;
+      background-color: #fff;
+      width: 90%;
+      height: 75%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       textarea {
-        width: 100%;
-        height: 80%;
+        width: 95%;
+        height: 85%;
         font-size: 14px;
         font-family: Helvetica,Arial, Malgun Gothic, sans-serif;
       }
-      button {
-        position: relative;
-        right: 0;
-        top: 0;
+    }
+    button {
+      background-color: #fff;
+      border: 2px solid #000;
+      border-radius: 5px;
+      width: 50px;
+      height: 40px;
+      cursor: pointer;
+    }
+  }
+  &.comments {
+    & > div {
+      border-bottom: 1px solid rgb(190, 190, 190);
+    }
+    & > div:last-child {
+      border: none;
+    }
+    padding: 20px;
+    
+    .comment {
+      margin-bottom: 5px;
+      &.top {
+        display: flex;
+        align-items: center;
+        height: 30px;
+        .comment-author {
+          padding: 0 8px;
+          width: 210px;
+          font-weight: 700;
+        }
+        .comment-created {
+          font-size: 12px;
+        }
+      }
+      &.bottom {
+        padding: 10px 8px;
+        display: flex;
+        .description {
+          width: 630px;
+        }
+        .comment-delete {
+          color: red;
+          font-weight: 700;
+          cursor: pointer;
+        }
       }
     }
   }

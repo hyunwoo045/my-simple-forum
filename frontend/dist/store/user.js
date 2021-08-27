@@ -1,0 +1,1 @@
+export default{namespaced:!0,state:()=>({username:"Guest"}),mutations:{setUsername(e,a){e.username=a.newName}}};

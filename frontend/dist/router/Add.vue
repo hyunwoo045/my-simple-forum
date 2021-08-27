@@ -1,26 +1,23 @@
 <template>
   <div class="container">
-    <div class="input-area mode">
-      {{ mode === 'modify' ? "글 수정" : "글 생성" }}
-    </div>
-    <div class="input-area top">
-      <input
-        v-model="author"
-        type="text"
-        class="name"
-        placeholder="닉네임" />
-    </div>
-    <div class="input-area title">
-      <input
-        v-model="curTitle"
-        type="text"
-        class="title"
-        placeholder="제목" />
-    </div>
-    <div class="input-area description">
-      <textarea
-        v-model="curDesc"
-        class="description"></textarea>
+    <div class="input-area">
+      <div class="mode-label">
+        {{ mode === 'modify' ? "수정" : "생성" }}
+      </div>
+
+      <div class="title">
+        <input
+          type="text"
+          v-model="curTitle"
+          placeholder="제목을 입력하세요." />
+      </div>
+
+      <div class="description">
+        <textarea
+          v-model="curDesc"
+          class="description"
+          placeholder="내용을 입력하세요."></textarea>
+      </div>
     </div>
     
     <div class="button-area">
@@ -62,7 +59,6 @@ export default {
   },
   data() {
     return {
-      author: '',
       curTitle: this.title,
       curDesc: this.description,
     }
@@ -72,6 +68,14 @@ export default {
       this.$router.go(-1);
     },
     createHandler() {
+      if (this.curTitle === '') {
+        alert('제목을 입력하세요.');
+        return;
+      } else if (this.curDesc === '') {
+        alert('내용을 입력하세요.');
+        return;
+      }
+      
       let url = ''
       if (this.mode === 'modify') {
         url = `${defaultAPI.end_point}/content/modify`
@@ -81,11 +85,10 @@ export default {
 
       this.$http.post(url, {
         id: this.contentId,
-        author: this.author,
+        author: this.$store.state.user.username,
         title: this.curTitle,
         description: this.curDesc,
-      }).then(response => {
-        console.log(response.data);
+      }).then(() => {
         this.$router.push('/');
       })
     }
@@ -95,29 +98,64 @@ export default {
 
 <style lang="scss" scoped>
 @import '~/scss/main';
-
-.container {
-  padding: 20px 20px;
-  box-sizing: border-box;
-  .input-area {
-    margin-bottom: 8px;
-    // &:last-child {
-    //   margin-bottom: 0;
-    // }
-    & > input {
-      margin-right: 8px;
-    }
-    & > .title {
-      width: 500px;
-    }
-    & > .description {
-      width: 500px;
-      height: 400px;
+.input-area {
+  .mode-label {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding: 13px 20px 0;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .title {
+    padding: 10px;
+    height: 45px;
+    input {
+      height: 80%;
+      width: 95%;
+      padding: 0 10px;
+      border: 1px solid rgb(134, 134, 134); 
+      border-radius: 4px;
     }
   }
-  button {
-    margin-right: 8px;
+  .description {
+    padding: 0 10px;
+    height: 45vh;
+    
+    textarea {
+      padding: 10px;
+      width: 95%;
+      height: 95%;
+      border: 1px solid rgb(134, 134, 134);
+      border-radius: 4px;
+    }
+    textarea:focus {
+      border: 2px solid black;
+    }
   }
 }
-
+.button-area {
+  padding: 10px 10px;
+  margin-top: 10px;
+  position: relative;
+  button {
+    height: 40px;
+    width: 90px;
+    font-size: 14px;
+    color: rgb(110, 110, 110);
+    background-color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .cancel {
+    border: 0.5px solid gray;
+  }
+  .submit {
+    position: absolute;
+    right: 24px;
+    background-color: rgb(33, 167, 62);
+    color: #fff;
+  }
+}
 </style>
