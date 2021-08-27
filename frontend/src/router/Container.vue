@@ -56,9 +56,6 @@ export default {
           name: "Read",
           query: {
             id: data.id,
-            // author: data.author,
-            // title: data.title,
-            // description: data.description,
           },
         });
       });

@@ -28,20 +28,187 @@ Vue.js 와 데이터베이스(MySQL), 클라우드 서버(AWS) 학습을 주 목
 
 <br />
 
-## 목표
-
-### 8월 26일
-
-- frontend style 작업
-- CORS 에러 해결
-
----
-
 ## Frontend
 
 ### Vue Router
 
-문서 작업 예정
+페이지 이동 시 데이터를 전송하는 법은 `params`로 전달하는 법과 `query`로 전달하는 법이 있습니다. <br />
+간단한 예시 코드를 통해 사용 방법을 기록하겠습니다.
+
+현재 vue-router 에 아래와 같은 라우터들이 등록되어 있다고 가정합니다.
+
+```javascript
+import { createRouter } from "vue-router";
+import Home from "./Home";
+import Next from "./Next";
+
+export default createRouter({
+  routes: [
+    {
+      path: "/",
+      component: Home,
+    },
+    {
+      path: "/next",
+      component: Next,
+    },
+  ],
+});
+```
+
+```html
+<!-- Home.vue -->
+<template>
+  <div class="Home">
+    <router-link :to="{ path: '/next' }"> NEXT로! </router-link>
+  </div>
+</template>
+```
+
+```html
+<!-- Next.vue -->
+<template>
+  <div class="Next">
+    <router-link :to="{ path: '/' }"> 홈으로! </router-link>
+  </div>
+</template>
+```
+
+각 페이지에서 서로 왔다갔다 하는 태그가 있는 아주 간단한 예제입니다. 이 때 서로 데이터를 주고 받도록 하려고 합니다. home 에서 next 로 'From Home' 이라는 메세지를, next 에서 home 으로 'From Next' 라는 메세지를 보내 보겠습니다.
+
+```html
+<!-- Home.vue -->
+<template>
+  <div class="Home">
+    <router-link
+      :to="{
+      path: '/next',
+      params: {
+        message: 'From Home!'
+      }}"
+    >
+      NEXT로!
+    </router-link>
+    <div>{{ $route.params.message }}</div>
+  </div>
+</template>
+```
+
+```html
+<!-- Next.vue -->
+<template>
+  <div class="Next">
+    <router-link
+      :to="{ 
+      path: '/',
+      params: {
+        message: 'From Next!'
+      }}"
+    >
+      홈으로!
+    </router-link>
+    <div>{{ $route.params.message }}</div>
+  </div>
+</template>
+```
+
+params 속성을 추가하여 전달할 데이터를 지정하고, 받는 측에서는 `$route.params.키` 형식으로 받으면 되겠습니다.
+
+태그에 너무 많은 코드를 쓰는 것은 별로 안 좋아하므로, `methods`로 따로 빼겠습니다.
+
+```html
+<template>
+  <div class="home" @click="toNext">Next로!</div>
+</template>
+
+<script>
+  export default {
+    methods: {
+      toNext() {
+        this.$route.push({
+          path: "/next",
+          params: {
+            message: "From Home",
+          },
+        });
+      },
+    },
+  };
+</script>
+```
+
+params 로 전달한 데이터는 받는 컴포넌트에서 `props`로 대신해서 사용할 수 있습니다. 이 때 라우터 구성에서 받는 컴포넌트 측의 props를 true로 변경해주어야 합니다.
+
+```javascript
+// ./routes/index.js
+import { createRouter } from "vue-router";
+import Home from "./Home";
+import Next from "./Next";
+
+export default createRouter({
+  routes: [
+    {
+      path: "/",
+      component: Home,
+    },
+    {
+      path: "/next",
+      component: Next,
+      props: true,
+    },
+  ],
+});
+```
+
+```html
+<!-- Next.vue -->
+<template>
+  <div class="Next">{{ message }}</div>
+</template>
+
+<script>
+  export default {
+    props: {
+      message: {
+        type: String,
+        default: "",
+      },
+    },
+  };
+</script>
+```
+
+params 대신 query 형식으로 사용하려면 코드의 `params` 대신 `query`로 바꿔주면 됩니다. <br />
+받는 쪽에서도 `$route.query.message` 와 같이 받아 사용하면 되겠습니다.
+
+```html
+<template>
+  <div class="home" @click="toNext">Next로!</div>
+</template>
+
+<script>
+  export default {
+    methods: {
+      toNext() {
+        this.$route.push({
+          path: "/next",
+          query: {
+            message: "From Home",
+          },
+        });
+      },
+    },
+  };
+</script>
+```
+
+- params 와 query 의 특징 및 차이점
+  - params 는 url에 전송할 데이터가 숨겨집니다.
+  - 대신 해당 페이지에서 새로고침을 할 경우 전송받은 파라미터값을 잃게 됩니다.
+  - 새로고침을 하더라도 정보를 유지하고 싶다면 query를 사용합니다.
+  - query 사용 시 url에 파라미터값이 드러나게 됩니다.
+    - ex) `localhost:8080/?message=From%20Home!`
+  - params 로 데이터를 숨기면서 페이지를 유지하고 싶다면 `localStorage` 기능을 잘 활용해 봐야 겠습니다.
 
 ### Vuex
 
@@ -73,6 +240,96 @@ import router from "./routes/index.js";
 import store from "./sotre/index.js";
 
 createApp(App).use(router).use(store).mount("#app");
+```
+
+특정 데이터에 관련된 state 들을 모으는 js 코드를 하나 작성해보겠습니다.
+
+이때 핵심 내용은 `namepsaced`, `state`, `getters`, `mutations`, `actions` 입니다.
+
+```javascript
+export default {
+  namespaced: true,
+
+  state: () => {
+    return {
+      username: "",
+    };
+  },
+
+  getters: {
+    getFirstName(state) {
+      return state.username.split(" ")[0];
+    },
+  },
+
+  mutations: {
+    setUsername(state, payload) {
+      const { newName } = payload;
+      state.username = newName;
+    },
+  },
+
+  actions: {
+    printUsername(context)) {
+      console.log(context.state.username);
+    },
+    printUsernameObj({ state }) {
+      console.log(state.username);
+    }
+  },
+};
+```
+
+- state
+  - Vue 컴포넌트에서 data와 유사합니다.
+- getters
+  - computed 와 유사합니다. state의 계산된 상태를 사용하게 해줍니다.
+  - state의 데이터를 사용하기 위해서 인자로 state 를 넘겨주어야 합니다.
+- mutations
+  - methods 와 유사합니다.
+  - state 를 변경할 수 있는 권한을 가집니다.
+  - state 를 변경하는 메서드는 mutations 에 선언해야 하며 이 외에는 허용되지 않습니다.
+- actions
+  - state 를 수정하지 않는 메서드를 정의합니다.
+  - actions 는 비동기 처리됩니다.
+  - state 에 관련된 정보를 인자로 직접 가져오려면 context를 사용해야 하며 (`context.state`), 객체 구조 분해를 이용하여 필요한 인자만 가져올 수도 있습니다.
+
+Vue 컴포넌트에서 스토어에 저장된 state를 사용하기 위해서는 `$store.state.모듈명.state이름` 로 호출합니다. <br />
+사용 예는 아래와 같습니다.
+
+```javascript
+export default {
+  created() {
+    this.name = this.$store.state.user.username;
+  }
+  data() {
+    return {
+      name: '',
+    }
+  },
+}
+
+```
+
+Vue 컴포넌트에서 `mutations`, `actions` 에 정의된 메서드들을 사용하기 위해서는 `$store.commit()` 과 `$store.dispatch()` 를 사용합니다. <br />
+사용 예는 아래와 같습니다.
+
+```javascript
+export default {
+  methods: {
+    setUsername(newName) {
+      // mutations
+      this.$store.commit("user/setUsername", {
+        newName,
+      });
+    },
+
+    printUsername() {
+      // actions
+      this.$store.dispatch("user/printUsername");
+    },
+  },
+};
 ```
 
 <br />
