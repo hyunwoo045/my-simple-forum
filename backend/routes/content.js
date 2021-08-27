@@ -17,9 +17,10 @@ router.get("/", (req, res) => {
   let id = queryData.id;
   let _query = "";
   if (id === undefined) {
-    _query = "SELECT * FROM contents";
+    _query = "SELECT * FROM contents ORDER BY created DESC";
     connection.query(_query, (err, topics) => {
       if (err) throw err;
+      connection.end();
       res.send(topics);
     });
   } else {
@@ -87,6 +88,22 @@ router.post("/delete", function (req, res) {
     if (err) throw err;
     res.send("Delete Completed");
   });
+});
+
+router.get("/get-by-author", function (req, res) {
+  const _url = req.url;
+  const queryData = url.parse(_url, true).query;
+  const author = queryData.author;
+
+  let connection = mysql.createConnection(dbConfig);
+  connection.query(
+    `SELECT * FROM contents WHERE author=? ORDER BY created DESC`,
+    [author],
+    (err, contents) => {
+      if (erro) throw err;
+      res.send(contents);
+    }
+  );
 });
 
 module.exports = router;
