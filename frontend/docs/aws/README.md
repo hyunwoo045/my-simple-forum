@@ -268,5 +268,3 @@ $ node app.js
 ![Ubuntu Nodejs](./images/ubuntu-nodejs.png)
 
 <br />
-
-## - Relational Database Service
