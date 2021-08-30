@@ -62,7 +62,6 @@ router.get("/page", (req, res) => {
 /* CREATE CONTENT */
 /* /api/content/create */
 router.post("/create", function (req, res) {
-  let id = String(req.body.id);
   let author = req.body.author;
   let title = req.body.title;
   let description = req.body.description;
