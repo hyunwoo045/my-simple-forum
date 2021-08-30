@@ -17,7 +17,7 @@ router.get("/", (req, res) => {
   let id = queryData.id;
   let _query = "";
   if (id === undefined) {
-    _query = "SELECT * FROM contents ORDER BY created DESC LIMIT 0, 5";
+    _query = "SELECT * FROM contents ORDER BY created DESC LIMIT 0, 10";
     connection.query(_query, (err, topics) => {
       if (err) throw err;
       connection.end();
