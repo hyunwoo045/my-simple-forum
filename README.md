@@ -4,7 +4,7 @@ Vue.js 와 데이터베이스(MySQL), 클라우드 서버(AWS) 학습을 주 목
 
 문서는 공부한 내용을 정리하는 방식으로 작성합니다.
 
-일별 개발 일지는 [./record]() 에 저장합니다.
+[DEMO](http://3.36.53.67) <- 테스트 해보세요 :)
 
 <br />
 
@@ -16,6 +16,7 @@ Vue.js 와 데이터베이스(MySQL), 클라우드 서버(AWS) 학습을 주 목
   - [axios로 API 요청](#axios로-API-요청)
   - [Webpack Proxy 설정](#Webpack-Proxy-설정)
   - [CORS issue](#CORS-issue)
+  - [nginx 로 배포](#nginx-로-배포)
 - [Backend](#Backend)
   - [Nodejs MySQL](#Nodejs-MySQL)
   - [Express Generator](#Express-Generator)
@@ -32,12 +33,12 @@ Vue.js 와 데이터베이스(MySQL), 클라우드 서버(AWS) 학습을 주 목
     - [Escaping](#Escaping)
 - [아마존 웹 서비스](<#아마존-웹-서비스-(AWS)>)
   - [EC2](#EC2)
-    - [인스턴스(Linux)접속](<#인스턴스(Linux)-접속>)
+    - [인스턴스(Linux) 접속](<#인스턴스(Linux)-접속>)
   - [AWS 제어 방법들](#AWS-제어-방법들)
   - [Javascript로 AWS 제어](#Javascript-로-AWS-제어)
   - [RDS 서버 생성하기](#RDS-서버-생성하기)
   - [RDS 인스턴스에 접속해보기](#RDS-인스턴스에-접속해보기)
-    - [mariaDB 한글 입력 오류 해결 방법](#mariaDB-한글-입력-오류-해결-방법)
+  - [mariaDB 한글 입력 오류 해결 방법](#mariaDB-한글-입력-오류-해결-방법)
 
 <br />
 
@@ -532,6 +533,64 @@ Express 가 아니더라도 간단히 요청 응답 헤더에 `Access-Control-Al
 res.writeHead(200, {
   "Access-Control-Allow-Origin": "https://relaxed-hopper-77fa06.netlify.app/#/",
 });
+```
+
+<br />
+
+## nginx 로 배포
+
+Netlify 로 배포한 frontend 의 프로토콜은 https 이고, 현재 AWS EC2 인스턴스에 구축한 API서버는 http 응답 프로토콜을 가지고 있으므로 Mixed Content 에러가 발생하였다. 크롬 브라우저 환경에서는 안전하지 않은 컨텐츠를 허용함으로써 테스트가 가능했으나, 휴대폰에서는 그 것이 어려웠다.
+
+해결할 방법이 여러 가지 있을 수 있겠으나, 우선 언젠가는 Netlify 의 도움을 받지 않고 frontend 를 배포할 일이 있을 듯 하여 Nginx 를 이용하여 직접 AWS EC2에 웹서버를 구축하여 배포해보려 한다.
+
+아주 간단한 과정으로 Vue 로 생성된 프로젝트를 배포한다.
+
+AWS EC2 인스턴스를 생성한 후 접속한다.
+
+```
+$ ssh -i [pem 키 경로] ubuntu@[퍼블릭 IPv4 주소]
+```
+
+Nginx 를 설치한다.
+
+```
+$ sudo apt-get update
+$ sudo apt-get upgrade
+$ sudo apt-get install nginx
+```
+
+아주 간단한 설정을 하여 현재 Vue 프로젝트가 빌드되어 있는 `dist` 폴더를 연결한다.
+`/etc/nginx/conf.d` 디렉토리에 `vuejs.conf` 파일을 생성하고 아래와 같이 입력한다.
+
+```
+server {
+  listen 80;
+  server_name 3.36.53.67;
+
+  location / {
+    root /home/ubuntu/(프로젝트 path)/dist;
+    index index.html;
+    try_files $uri $uri/ /index.html;
+  }
+}
+```
+
+이 후 Nginx 문법이 다 맞는지 확인한 후 Nginx 를 재시작한다.
+
+```
+$ sudo nginx -t
+$ sudo systemctl restart nginx
+```
+
+http://3.36.53.67 에 접속해보면 정상적으로 배포되었음을 확인할 수 있다.
+
+### Nginx 삭제
+
+```
+$ sudo apt-get remove nginx nginx-common  # config files를 제외하고 삭제
+$ sudo apt-get purge nginx nginx-common  # 전체 다 삭제
+$ sudo apt-get autoremove  # 종속성 관련 패키지 삭제
+$ rm -rf /etc/nginx
 ```
 
 ---
