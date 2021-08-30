@@ -25,6 +25,7 @@ Vue.js 와 데이터베이스(MySQL), 클라우드 서버(AWS) 학습을 주 목
   - [MySQL 설치](#MySQL-설치)
   - [데이터베이스(schema)의 생성, 삭제, 확인](<#데이터베이스(schema)의-생성,-삭제,-확인>)
   - [표 (table)](<#표-(table)>)
+  - [페이징의 구현](#페이징의-구현)
   - [관계형 데이터베이스의 필요성](#관계형-데이터베이스의-필요성)
     - [JOIN](#JOIN)
   - [MySQL Workbench 설치](#MySQL-Workbench-설치)
@@ -950,6 +951,95 @@ DELETE FROM topic WHERE id=5;
 ```
 
 - 마찬가지로 WHERE 문을 빠트린다거나 하는 실수를 하면 새로운 인생의 전환점을 맞이하므로 주의하자.
+
+<br />
+
+## 페이징의 구현
+
+현재 웹페이지는 홈 화면에 접속했을 때 데이터베이스 내에 있는 모든 글들을 가져오고 있다. 10개 남짓한 데이터로 테스트할 때야 문제가 없지만 글이 1000~10000개 이상으로 늘어나게 된다면 사용자가 보지도 않는 쓸모없는 글들을 가져오는 비효율적이게 된다. 이를 해결하기 위해 페이지 기능을 추가하며, 실제 데이터베이스에서 가져오는 정보의 수를 제어하여 효율적인 동작을 하도록 한다.
+
+여러 방법의 페이징을 구현할 수 있다. 아래와 같은 모양의 숫자를 클릭하면 원하는 페이지의 글들을 볼 수 있는 방법도 있겠으나,
+
+```
+[1][2][3][4] ....
+```
+
+글 최하단에 '더보기' 버튼 기능을 추가하여 사용자가 클릭하였을 때에 볼 수 있는 글을 추가할 수 있도록 하려 한다.
+
+### MySQL - LIMIT
+
+구현하기 위해서 SQL 문의 LIMIT 키워드를 활용한다.
+
+```SQL
+SELECT * FROM contents;  # 모든 row 를 출력
+
+SELECT * FROM contents LIMIT 0, 10;  # 0번째부터 10개의 row (0 ~ 9) 출력
+SELECT * FROM contents LIMIT 10, 10;  # 10번째부터 10개의 row (10 ~ 19) 출력
+```
+
+이 기능을 Frontend 에서 동적으로 제어한다.
+
+state 에 `currentPage` 상태를 추가.
+
+```javascript
+export default {
+  data() {
+    return {
+      // ...
+      contents = [];
+      currentPage = 1;
+    }
+  }
+}
+```
+
+그리고 더보기를 클릭했을 때에 동작할 메서드를 정의한다. 클릭 시 페이지 상태를 API서버로 넘겨주고 받은 데이터를 글 목록에 추가하고, 현재 페이지 넘버를 +1 한다.
+
+```javascript
+export default {
+  data() {
+    return {
+      // ...
+      contents = [];
+      currentPage = 1;
+    }
+  },
+  methods: {
+    seeMoreContents() {
+      this.$http.get(`${defaultAPI.end_point}/content/page?page=${this.currentPage}`).then(response => {
+        this.currentPage += 1;
+        this.contents.push(...response.data);
+      })
+    }
+  }
+}
+```
+
+API서버 측에서는 받은 페이지 넘버를 가공한 후 쿼리문을 실행하여 응답하도록 코드를 추가한다.
+
+```javascript
+/* READ MORE CONTENTS */
+/* /api/content/page?page={} */
+router.get("/page", (req, res) => {
+  let connection = mysql.createConnection(dbConfig);
+  connection.connect();
+
+  let _url = req.url;
+  let queryData = url.parse(_url, true).query;
+  let pageNumber = queryData.page;
+  let startIndex = pageNumber * 10;
+
+  connection.query(
+    "SELECT * FROM contents ORDER BY created DESC LIMIT ?, 10",
+    [startIndex],
+    (err, contents) => {
+      if (err) throw err;
+      connection.end();
+      res.send(contents);
+    }
+  );
+});
+```
 
 <br />
 

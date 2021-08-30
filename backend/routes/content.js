@@ -9,7 +9,7 @@ const dbConfig = new dbkey().config;
 /* READ CONTENTS */
 /* /api/content | /api/content?id=[] */
 router.get("/", (req, res) => {
-  var connection = mysql.createConnection(dbConfig);
+  let connection = mysql.createConnection(dbConfig);
   connection.connect();
 
   let _url = req.url;
@@ -17,7 +17,7 @@ router.get("/", (req, res) => {
   let id = queryData.id;
   let _query = "";
   if (id === undefined) {
-    _query = "SELECT * FROM contents ORDER BY created DESC";
+    _query = "SELECT * FROM contents ORDER BY created DESC LIMIT 0, 5";
     connection.query(_query, (err, topics) => {
       if (err) throw err;
       connection.end();
@@ -34,6 +34,29 @@ router.get("/", (req, res) => {
       }
     );
   }
+});
+
+/* READ MORE CONTENTS */
+/* /api/content/page?page={} */
+
+router.get("/page", (req, res) => {
+  let connection = mysql.createConnection(dbConfig);
+  connection.connect();
+
+  let _url = req.url;
+  let queryData = url.parse(_url, true).query;
+  let pageNumber = queryData.page;
+  let startIndex = pageNumber * 10;
+
+  connection.query(
+    "SELECT * FROM contents ORDER BY created DESC LIMIT ?, 10",
+    [startIndex],
+    (err, contents) => {
+      if (err) throw err;
+      connection.end();
+      res.send(contents);
+    }
+  );
 });
 
 /* CREATE CONTENT */
