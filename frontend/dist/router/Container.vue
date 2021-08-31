@@ -25,6 +25,11 @@
           </div>
         </div>
       </div>
+      <div
+        class="see-more"
+        @click="seeMoreContents">
+        {{ canSeeMore ? "더보기" : "더보기 없음" }}
+      </div>
     </div>
   </div>
 </template>
@@ -35,6 +40,8 @@ export default {
   data() {
     return {
       contents: [],
+      currentPage: 1,
+      canSeeMore: true,
     }
   },
   created() {
@@ -60,6 +67,16 @@ export default {
         });
       });
     },
+    seeMoreContents() {
+      this.$http.get(`${defaultAPI.end_point}/content/page?page=${this.currentPage}`).then(response => {
+        if (response.data.length > 0) {
+          this.currentPage += 1;
+          this.contents.push(...response.data);
+        } else {
+          this.canSeeMore = false;
+        }
+      })
+    },
   },
 };
 </script>
@@ -82,6 +99,8 @@ export default {
 .content {
   height: 70px;
   padding: 0 30px;
+  transition: 0.2s;
+  cursor: pointer;
   &:hover {
     background-color: rgb(189, 189, 189);
   }
@@ -108,10 +127,14 @@ export default {
     }
   }
 }
-.btn-container {
-  width: 100%;
-  height: 10vh;
+.see-more {
+  height: 65px;
   display: flex;
+  justify-content: center;
   align-items: center;
+  border-top: 1px solid gray;
+  &:hover {
+    background-color: rgb(189, 189, 189);
+  }
 }
 </style>

@@ -100,6 +100,7 @@ export default {
   height: 70px;
   padding: 0 30px;
   transition: 0.2s;
+  cursor: pointer;
   &:hover {
     background-color: rgb(189, 189, 189);
   }

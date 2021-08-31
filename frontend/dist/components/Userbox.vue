@@ -128,13 +128,22 @@ export default {
       font-size: 13px;
       font-weight: 700;
       margin-right: 4px;
+      transition: 0.3s;
+      &:hover {
+        background-color: rgb(143, 143, 143);
+        color: #fff;
+      }
       &:last-child {
         margin: 0;
       }
       &.write {
         background-color: rgb(0, 165, 0);
-        color: white;
+        color: #fff;
         text-decoration: none;
+        &:hover {
+          background-color: #fff;
+          color: rgb(0, 165, 0);
+        }
       }
     }
   }
