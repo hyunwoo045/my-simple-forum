@@ -32,6 +32,7 @@ Vue.js 와 데이터베이스(MySQL), 클라우드 서버(AWS) 학습을 주 목
   - [데이터베이스 보안](#데이트베이스-보안)
     - [SQL Injection](#SQL-Injection)
     - [Escaping](#Escaping)
+  - [참조 무결성](#참조-무결성)
 - [아마존 웹 서비스](<#아마존-웹-서비스-(AWS)>)
   - [EC2](#EC2)
     - [인스턴스(Linux) 접속](<#인스턴스(Linux)-접속>)
@@ -1241,6 +1242,71 @@ $ npm i sanitize-html
 위 패키지를 이용하여 사전에 작성되지 않은 위험한 Javascript 코드가 사용자 입력으로 들어오게 되면 코드를 실행하지 않고 탈출(Escaping)하는 기법을 적용한다.
 
 <br />
+
+## 참조 무결성
+
+현재 데이터베이스에는 두 테이블이 있는데 아래와 같이 만들어졌다.
+
+```SQL
+CREATE TABLE contents (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  title VARCHAR(100) NOT NULL,
+  description TEXT NULL,
+  author VARCHAR(30) NOT NULL,
+  created DATETIME NOT NULL,
+  updated DATETIME NOT NULL,
+  PRIMARY KEY(id));
+
+CREATE TABLE comments (
+  id INT(11) NOT NULL,
+  author VARCHAR (30) NOT NULL,
+  description TEXT NOT NULL,
+  created DATETIME NOT NULL,
+  updated DATETIME NOT NULL,
+  content_id INT(11) NOT NULL,
+  PRIMARY KEY(id));
+```
+
+현재로써는 서로 아무런 관련이 없게 만들어져 있지만 실제 웹 사이트에서의 기능을 보면 댓글은 글이 있어야 존재할 수 있는 데이터들만을 가지고 있고, 당연히 특정 글이 삭제되면 그 글에 달려 있던 댓글들도 삭제되어야 하는 구조를 가졌다.
+
+하지만 현재는 글이 삭제되더라도 그 글에 달려있는 댓글 데이터는 삭제되지 않는다. 이 것을 보고 `참조 무결성`이 깨졌다고 한다. 따라서 외래키를 적용하여 comments 테이블이 contents 테이블을 참조할 수 있도록 만들고, contents 의 데이터가 삭제될 경우 연관되어 있는 comments 의 데이터도 같이 삭제될 수 있도록 수정해보려 한다.
+
+현재 `./api/comment?id=${content_id}` API 호출이 올 경우 contents 테이블의 id 와 연관되어 있는 comments 테이블의 모든 레코드를 보내주도록 구성되어 있다.
+
+```SQL
+SELECT * FROM comments WHERE content_id=?
+```
+
+즉, comments.content_id 와 contents.id 가 참조 관계에 있고, comments 가 자식 테이블에 해당하니 comments 테이블에 외래키를 추가해보자. 그리고 contents 의 데이터가 삭제되면 comments 의 데이터도 삭제되어야 하니 그 기능을 하는 `ON DELETE CASCADE` 도 붙혀주자.
+
+```SQL
+ALTER TABLE comments ADD FOREIGN KEY (content_id) REFERENCES contents(id) ON DELETE CASCADE;
+```
+
+주의할 점
+
+- 외래키 값은 부모 테이블의 기본키 값과 동일해야 한다.
+  - `contents.id INT(11) NOT NULL` 인데 `comments.content_id VARCHAR(11)` 이러면 연결이 안됨
+- 부모 테이블의 기본키, 고유키를 외래키로 지정할 수 있다.
+
+테이블을 만들때 부터 외래키를 설정하려면 아래와 같이 하면 된다.
+
+```SQL
+CREATE TABLE comments (
+  # ...
+  FOREIGN KEY(content_id),
+  REFERENCES contents(id),
+  ON DELETE CASCADE );
+```
+
+`ON DELETE`, `ON UPDATE` 에 대해서 옵션을 지정할 수 있다. 내용은 아래와 같다.
+
+- CASCADE : 부모 테이블에서 데이터가 삭제, 수정되면 참조하는 테이블에서도 삭제, 수정
+- SET NULL : 부모 테이블 데이터가 삭제, 수정되면 참조하는 테이블의 데이터가 NULL 이 됨.
+- SET DEFAULT : DEFAULT 값이 됨.
+- NO ACTION : 부모 테이블 데이터가 삭제, 수정되더라도 참조하는 테이블의 데이터는 변경되지 않음.
+- RESTRICT : 자식 테이블에 데이터가 남아있으면, 부모 테이블의 데이터를 삭제, 수정 할 수 없다.
+  <br />
 
 ---
 

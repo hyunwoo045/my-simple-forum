@@ -186,7 +186,7 @@ export default {
   padding: 30px 20px;
 
   .description {
-    white-space: pre-line;
+    white-space: pre;
   }
 }
 
