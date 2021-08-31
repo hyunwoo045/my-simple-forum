@@ -1,6 +1,47 @@
+a {
+  text-decoration: none;
+  color: #000;
+}
+
 .container {
   margin: 0 auto;
   width: 750px;
   background-color: #fff;
   box-sizing: border-box;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #000;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 13px;
+  width: 90px;
+  height: 40px;
+  cursor: pointer;
+  transition: 0.3s;
+  &:hover {
+    background-color: rgb(143, 143, 143);
+    color: #fff;
+  }
+}
+
+.btn.green {
+  background-color: rgb(0, 165, 0);
+  color: #fff;
+  &:hover {
+    background-color: #fff;
+    color: rgb(0, 165, 0);
+  }
+}
+
+.btn.red {
+  background-color: rgb(245, 149, 149);
+  color: #000;
+  &:hover {
+    background-color: rgb(255, 0, 0);
+    color: #fff;
+  }
 }

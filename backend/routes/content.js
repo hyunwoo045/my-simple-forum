@@ -15,14 +15,25 @@ router.get("/", (req, res) => {
   let _url = req.url;
   let queryData = url.parse(_url, true).query;
   let id = queryData.id;
-  let _query = "";
   if (id === undefined) {
-    _query = "SELECT * FROM contents ORDER BY created DESC LIMIT 0, 10";
-    connection.query(_query, (err, topics) => {
-      if (err) throw err;
-      connection.end();
-      res.send(topics);
-    });
+    connection.query(
+      "SELECT * FROM contents ORDER BY created DESC LIMIT 0, 10",
+      (err, topics) => {
+        if (err) throw err;
+        connection.query(
+          "SELECT COUNT(*) AS length FROM contents",
+          (err, contentCnt) => {
+            connection.end();
+            res.send({
+              length: contentCnt[0].length,
+              topics,
+            });
+          }
+        );
+        // connection.end();
+        // res.send(topics);
+      }
+    );
   } else {
     connection.query(
       "SELECT * FROM contents WHERE id=?",
@@ -38,7 +49,6 @@ router.get("/", (req, res) => {
 
 /* READ MORE CONTENTS */
 /* /api/content/page?page={} */
-
 router.get("/page", (req, res) => {
   let connection = mysql.createConnection(dbConfig);
   connection.connect();
@@ -115,6 +125,8 @@ router.post("/delete", function (req, res) {
   });
 });
 
+/* GET CONTENT FILTERED BY AUTHOR */
+/* /api/content/get_by_author?author=${} */
 router.get("/get_by_author", function (req, res) {
   const _url = req.url;
   const queryData = url.parse(_url, true).query;

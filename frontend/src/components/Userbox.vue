@@ -24,17 +24,17 @@
 
     <div class="button-area">
       <RouterLink
-        class="btn write"
+        class="btn green"
         :to="{ name: 'Add', params: { mode: 'add' } }">
         글쓰기
       </RouterLink>
       <div
-        class="btn search-my"
+        class="btn"
         @click="searchMyContents">
         내가 쓴 글
       </div>
       <div
-        class="btn search-all"
+        class="btn"
         @click="searchAllContents">
         전체 글
       </div>
@@ -112,38 +112,13 @@ export default {
       cursor: pointer;
     }
   }
-
   .button-area {
     display: flex;
     position: relative;
     .btn {
-      border: 1px solid black;
-      border-radius: 4px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 90px;
-      height: 40px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 700;
       margin-right: 4px;
-      transition: 0.3s;
-      &:hover {
-        background-color: rgb(143, 143, 143);
-        color: #fff;
-      }
       &:last-child {
         margin: 0;
-      }
-      &.write {
-        background-color: rgb(0, 165, 0);
-        color: #fff;
-        text-decoration: none;
-        &:hover {
-          background-color: #fff;
-          color: rgb(0, 165, 0);
-        }
       }
     }
   }

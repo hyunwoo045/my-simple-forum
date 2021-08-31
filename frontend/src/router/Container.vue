@@ -25,10 +25,27 @@
           </div>
         </div>
       </div>
-      <div
-        class="see-more"
-        @click="seeMoreContents">
-        {{ canSeeMore ? "더보기" : "더보기 없음" }}
+      <div class="pages">
+        <span
+          class="page prev"
+          v-if="currentPageWrap !== 0"
+          @click="pagePrevWrap">
+          이전
+        </span>
+        <span
+          class="page"
+          v-for="pageNumber in pageNumberList"
+          :class="pageNumber === currentPage ? 'active' : ''"
+          :key="pageNumber"
+          @click="pageHandler(pageNumber)">
+          [{{ pageNumber }}]
+        </span>
+        <span
+          class="page next"
+          v-if="(currentPageWrap + 1) * 5 <= maxPageNumber"
+          @click="pageNextWrap">
+          다음
+        </span>
       </div>
     </div>
   </div>
@@ -37,22 +54,43 @@
 <script>
 import defaultAPI from '~/core/defaultAPI'
 export default {
+  created() {
+    if (this.$route.query.author === undefined) {
+      this.$http.get(`${defaultAPI.end_point}/content`).then((response) => {
+        this.contents = response.data.topics;
+        this.maxPageNumber = Math.ceil(response.data.length / 10);
+        console.log(response.data.length)
+      });
+    } else {
+      this.$http.get(
+        `${defaultAPI.end_point}/content/get_by_author?author=${this.$route.query.author}`)
+        .then(response => {
+        this.contents = response.data;
+      });
+    }
+  },
   data() {
     return {
       contents: [],
       currentPage: 1,
-      canSeeMore: true,
+      currentPageWrap: 0,
+      maxPageNumber: 1,
     }
   },
-  created() {
-    if (this.$route.query.author === undefined) {
-      this.$http.get(`${defaultAPI.end_point}/content`).then((response) => {
-        this.contents = response.data;
-      });
-    } else {
-      this.$http.get(`${defaultAPI.end_point}/content/get_by_author?author=${this.$route.query.author}`).then(response => {
-        this.contents = response.data;
-      });
+  computed: {
+    pageNumberList() {
+      let res = [];
+      let startPageNumber = this.currentPageWrap * 5;
+      if (startPageNumber + 5 > this.maxPageNumber) {
+        for (let i=1; i <= this.maxPageNumber - startPageNumber; i++) {
+          res.push(startPageNumber + i);
+        }
+      } else {
+        for (let i=1; i <= 5; i++) {
+          res.push(startPageNumber + i);
+        }
+      }
+      return res
     }
   },
   methods: {
@@ -67,16 +105,21 @@ export default {
         });
       });
     },
-    seeMoreContents() {
-      this.$http.get(`${defaultAPI.end_point}/content/page?page=${this.currentPage}`).then(response => {
-        if (response.data.length > 0) {
-          this.currentPage += 1;
-          this.contents.push(...response.data);
-        } else {
-          this.canSeeMore = false;
-        }
+    pageHandler(pageNumber) {
+      this.$http.get(`${defaultAPI.end_point}/content/page?page=${pageNumber - 1}`)
+      .then(response => {
+        this.contents = response.data;
+        this.currentPage = pageNumber;
       })
     },
+    pageNextWrap() {
+      this.currentPageWrap += 1;
+      this.pageHandler(this.currentPageWrap * 5 + 1);
+    },
+    pagePrevWrap() {
+      this.currentPageWrap -= 1;
+      this.pageHandler(this.currentPageWrap * 5 + 1);
+    }
   },
 };
 </script>
@@ -119,7 +162,7 @@ export default {
     display: flex;
     padding: 4px 0;
     &.author {
-      width: 300px;
+      width: 80%;
       font-size: 14px;
     }
     &.created {
@@ -127,14 +170,28 @@ export default {
     }
   }
 }
-.see-more {
-  height: 65px;
+// .see-more {
+//   height: 65px;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   border-top: 1px solid gray;
+//   &:hover {
+//     background-color: rgb(189, 189, 189);
+//   }
+// }
+.pages {
+  height: 50px;
+  border-top: 1px solid gray;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-top: 1px solid gray;
-  &:hover {
-    background-color: rgb(189, 189, 189);
+  .page {
+    margin-right: 5px;
+    cursor: pointer;
+    &.active {
+      font-weight: 700;
+    }
   }
 }
 </style>

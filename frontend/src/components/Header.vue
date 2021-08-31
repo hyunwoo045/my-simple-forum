@@ -3,8 +3,12 @@
     <RouterLink
       to="/"
       class="logo">
-      MY-SIMPLE-<span class="highlight">FORUM<span>
-      </span></span>
+      MY-SIMPLE-<span class="highlight">FORUM</span>
+    </RouterLink>
+    <RouterLink to="/login">
+      <div class="btn">
+        LOGIN
+      </div>
     </RouterLink>
   </header>
 </template>
