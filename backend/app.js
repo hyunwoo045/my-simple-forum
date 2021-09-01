@@ -1,4 +1,4 @@
-const whitelist = ["*"];
+const whitelist = ["http://3.36.53.67", "http://127.0.0.1:8080"];
 const corsOption = {
   origin: function (origin, callback) {
     var isWhiteListed = whitelist.indexOf(origin) !== 1;
@@ -16,6 +16,7 @@ var logger = require("morgan");
 
 var commentRouter = require("./routes/comment");
 var contentRouter = require("./routes/content");
+var userRouter = require("./routes/user");
 
 var app = express();
 
@@ -32,6 +33,7 @@ app.use(cors);
 
 app.use("/api/comment", commentRouter);
 app.use("/api/content", contentRouter);
+app.use("/api/user", userRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

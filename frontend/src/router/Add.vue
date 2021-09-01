@@ -85,7 +85,7 @@ export default {
 
       this.$http.post(url, {
         id: this.contentId,
-        author: this.$store.state.user.username,
+        user_id: this.$store.state.user.id,
         title: this.curTitle,
         description: this.curDesc,
       }).then(() => {

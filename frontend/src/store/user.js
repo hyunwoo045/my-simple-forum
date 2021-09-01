@@ -3,16 +3,17 @@ export default {
 
   state: () => {
     return {
-      username: "Guest",
-      contents: [],
+      id: -1,
+      username: "",
+      writable: false,
     };
   },
   mutations: {
     setUsername(state, payload) {
-      state.username = payload.newName;
-    },
-    setContents(state, payload) {
-      state.contents = payload.contents;
+      const { id, nickname } = payload;
+      state.id = id;
+      state.username = nickname;
+      state.writable = true;
     },
   },
 };

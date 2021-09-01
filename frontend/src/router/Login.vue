@@ -5,19 +5,33 @@
     </div>
     <div class="login">
       <div class="form">
+        <div class="errmsg">
+          {{ emailErr ? '이메일을 입력하세요.' 
+            : passwordErr ? '패스워드를 입력하세요.' 
+              : inputErr ? '잘못된 정보 입력입니다.'
+                :'' }}
+        </div>
         <div class="id">
           <div class="label">
-            아이디
-          </div> <input type="text" />
+            이메일
+          </div> <input
+            type="text"
+            v-model="inputs.email"
+            @focus="resetStatus" />
         </div>
         <div class="password">
           <div class="label">
             비밀번호
-          </div> <input type="text" />
+          </div> <input
+            type="password"
+            v-model="inputs.password"
+            @focus="resetStatus" />
         </div>
       </div>
       <div class="submit">
-        <div class="btn">
+        <div
+          class="btn"
+          @click="loginHandler">
           로그인
         </div>
       </div>
@@ -39,8 +53,58 @@
 </template>
 
 <script>
+import defaultAPI from '~/core/defaultAPI';
 export default {
-  
+  data() {
+    return {
+      inputs: {
+        email: '',
+        password: '',
+      },
+      emailErr: false,
+      passwordErr: false,
+      inputErr: false,
+    }
+  },
+  methods: {
+    loginHandler() {
+      if (this.inputs.email === '') {
+        this.emailErr = true;
+        return;
+      } else if (this.inputs.password === '') {
+        this.passwordErr = true;
+        return;
+      }
+
+      this.$http.post(`${defaultAPI.end_point}/user/login`, 
+      { 
+        email: this.inputs.email,
+        password: this.inputs.password,
+      }).then(response => {
+        if (response.data.length === 0) {
+          this.inputErr = true;
+          this.resetInputs();
+        } else {
+          const nickname = response.data[0].nickname;
+          const id = response.data[0].id;
+          this.$store.commit('user/setUsername', {
+            id,
+            nickname
+          });
+          this.$router.push('/');
+        }
+      })
+    },
+    resetStatus() {
+      this.emailErr = false;
+      this.passwordErr = false;
+      this.inputErr = false;
+    },
+    resetInputs() {
+      this.inputs.email = '';
+      this.inputs.password = '';
+    },
+  }
 }
 </script>
 
@@ -61,6 +125,11 @@ export default {
   border-bottom: 1px solid gray;
   .form {
     width: 40%;
+    .errmsg {
+      font-size: 12px;
+      color: red;
+      font-weight: 700;
+    }
     .id, .password, .submit {
       height: 50px;
       display: flex;
