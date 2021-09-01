@@ -173,9 +173,6 @@ export default {
       } else {
         return
       }
-      
-
-
     },
     setCurrentCommentIndex(idx) {
       this.curCommentIdx = idx;
