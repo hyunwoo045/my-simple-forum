@@ -4,9 +4,9 @@
       <div
         class="username"
         v-if="!toggler">
-        {{ username }}
+        {{ $store.state.user.writable ? username : '로그인이 필요합니다.' }}
       </div>
-      <div
+      <!-- <div
         class="username change"
         v-else>
         <input
@@ -14,30 +14,32 @@
           maxlength="11"
           v-model="curName"
           @keyup.enter="toggleUsername" />
-      </div>
-      <div
+      </div> -->
+      <!-- <div
         class="change-username"
         @click="toggleUsername">
         수정
-      </div>
+      </div> -->
     </div>
 
     <div class="button-area">
-      <RouterLink
-        class="btn green"
-        :to="{ name: 'Add', params: { mode: 'add' } }">
-        글쓰기
-      </RouterLink>
-      <div
-        class="btn"
-        @click="searchMyContents">
-        내가 쓴 글
-      </div>
       <div
         class="btn"
         @click="searchAllContents">
         전체 글
       </div>
+      <div
+        class="btn"
+        v-if="$store.state.user.writable"
+        @click="searchMyContents">
+        내가 쓴 글
+      </div>
+      <RouterLink
+        class="btn green"
+        v-if="$store.state.user.writable"
+        :to="{ name: 'Add', params: { mode: 'add' } }">
+        글쓰기
+      </RouterLink>
     </div>
   </div>
 </template>
@@ -71,7 +73,7 @@ export default {
       this.$router.push({
         name: "Home",
         query: {
-          author: this.$store.state.user.username,
+          author: this.$store.state.user.id,
         }
       });
     },
@@ -97,7 +99,6 @@ export default {
     .username {
       padding: 0 20px;
       font-size: 19px;
-      width: 190px;
       box-sizing: border-box;
       &.change {
         input {

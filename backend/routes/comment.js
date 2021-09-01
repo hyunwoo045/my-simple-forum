@@ -17,7 +17,7 @@ router.get("/", (req, res) => {
   let id = queryData.id;
 
   connection.query(
-    "SELECT * FROM comments WHERE content_id=?",
+    "SELECT comments.id, user_id, users.nickname AS author, description, created, updated FROM comments LEFT JOIN users ON user_id=users.id WHERE content_id=?",
     [id],
     (err, comments) => {
       if (err) throw err;
@@ -32,38 +32,17 @@ router.get("/", (req, res) => {
 router.post("/create", (req, res) => {
   let connection = mysql.createConnection(dbConfig);
   connection.connect();
-  let author = req.body.author;
+  let user_id = req.body.user_id;
   let description = req.body.description;
   let content_id = req.body.content_id;
 
   connection.query(
-    "INSERT INTO comments (author, description, created, updated, content_id) VALUES(?, ?, NOW(), NOW(), ?)",
-    [author, description, content_id],
+    "INSERT INTO comments (user_id, description, created, updated, content_id) VALUES(?, ?, NOW(), NOW(), ?)",
+    [user_id, description, content_id],
     (err) => {
       if (err) throw err;
       connection.end();
       res.send("Comment Added");
-    }
-  );
-});
-
-/* UPDATE COMMENT */
-/* /api/comment/modify */
-router.post("/modify", (req, res) => {
-  let connection = mysql.createConnection(dbConfig);
-  connection.connect();
-
-  let id = req.body.id;
-  let author = req.body.author;
-  let description = req.body.description;
-
-  connection.query(
-    "UPDATE comments SET author=?, description=?, updated=NOW() WHERE id=?",
-    [author, description, id],
-    (err) => {
-      if (err) throw err;
-      connection.end();
-      res.send("COMMENT UPDATED");
     }
   );
 });

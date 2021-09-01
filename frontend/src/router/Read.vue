@@ -25,8 +25,9 @@
         <div class="comment-area label">
           댓글
         </div>
-
-        <div class="comment-area inputs">
+        <div
+          class="comment-area inputs"
+          v-if="$store.state.user.writable">
           <div class="comment-write">
             <textarea
               class="comment-write-inner"
@@ -38,6 +39,11 @@
             @click="addComment">
             작성
           </button>
+        </div>
+        <div
+          class="comment-area inputs"
+          v-else>
+          로그인하세요
         </div>
 
         <div class="comment-area comments">
@@ -62,7 +68,7 @@
               </div>
               <div
                 class="comment-delete"
-                @click="commentDelete(comment.id)"
+                @click="commentDelete(comment.user_id, comment.id)"
                 v-if="curCommentIdx === commentIdx">
                 삭제
               </div>
@@ -84,6 +90,9 @@ export default {
       this.contentTitle = response.data[0].title;
       this.contentDescription = response.data[0].description;
       this.contentAuthor = response.data[0].author;
+      if (response.data[0].user_id === this.$store.state.user.id) {
+        this.thisUserUpdatable = true;
+      }
       this.$http.get(`${defaultAPI.end_point}/comment?id=${this.$route.query.id}`)
       .then(response => {
         this.comments = response.data;
@@ -99,10 +108,15 @@ export default {
       curCommentIdx: -1,
       comments: [],
       commentDescription: '',
+      thisUserUpdatable: false,
     }
   },
   methods: {
     modifyHandler() {
+      if (!this.thisUserUpdatable) {
+        alert('수정 권한이 없습니다.');
+        return
+      }
       this.$router.push({
         name: 'Add',
         params: {
@@ -113,15 +127,24 @@ export default {
         },
       })
     },
-    async deleteHandler() {
-      await this.$http.post(`${defaultAPI.end_point}/content/delete`, { id: this.contentId }).then(() => {
-        this.$router.push('/')
-      })
+    deleteHandler() {
+      if (!this.thisUserUpdatable) {
+        alert('삭제 권한이 없습니다.');
+        return
+      }
+
+      if (confirm("정말 삭제하시겠습니까?") === true) {
+        this.$http.post(`${defaultAPI.end_point}/content/delete`, { id: this.contentId }).then(() => {
+          this.$router.push('/')
+        })
+      } else {
+        return
+      }
     },
 
     addComment() {
       this.$http.post(`${defaultAPI.end_point}/comment/create`, {
-        author: this.$store.state.user.username,
+        user_id: this.$store.state.user.id,
         description: this.commentDescription,
         content_id: this.contentId
       }).then(() => {
@@ -132,15 +155,25 @@ export default {
         this.commentDescription = '';
       });
     },
-    commentDelete(id) {
-      this.$http.post(`${defaultAPI.end_point}/comment/delete`, {
-        id
-      }).then(() => {
-        this.$http.get(`${defaultAPI.end_point}/comment?id=${this.contentId}`)
-        .then((response) => {
-          this.comments = response.data;
-        })
-      });
+    commentDelete(user_id, id) {
+      if (this.$store.state.user.id !== user_id) {
+        alert('삭제 권한이 없습니다.');
+        return
+      }
+
+      if (confirm("댓글을 정말 삭제하시겠습니까?") === true) {
+        this.$http.post(`${defaultAPI.end_point}/comment/delete`, {
+          id
+        }).then(() => {
+          this.$http.get(`${defaultAPI.end_point}/comment?id=${this.contentId}`)
+          .then((response) => {
+            this.comments = response.data;
+          })
+        });
+      } else {
+        return
+      }
+      
 
 
     },

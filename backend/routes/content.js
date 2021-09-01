@@ -17,7 +17,7 @@ router.get("/", (req, res) => {
   let id = queryData.id;
   if (id === undefined) {
     connection.query(
-      "SELECT * FROM contents ORDER BY created DESC LIMIT 0, 10",
+      "SELECT contents.id, user_id, users.nickname AS author, title, description, created, updated FROM contents LEFT JOIN users ON user_id = users.id ORDER BY created DESC LIMIT 0, 10;",
       (err, topics) => {
         if (err) throw err;
         connection.query(
@@ -36,7 +36,7 @@ router.get("/", (req, res) => {
     );
   } else {
     connection.query(
-      "SELECT * FROM contents WHERE id=?",
+      "SELECT contents.id, user_id, users.nickname AS author, title, description, created, updated FROM contents LEFT JOIN users ON user_id = users.id WHERE contents.id=? ORDER BY created DESC LIMIT 0, 10;",
       [id],
       (err, topics) => {
         if (err) throw err;
@@ -59,7 +59,7 @@ router.get("/page", (req, res) => {
   let startIndex = pageNumber * 10;
 
   connection.query(
-    "SELECT * FROM contents ORDER BY created DESC LIMIT ?, 10",
+    "SELECT contents.id, user_id, users.nickname AS author, title, description, created, updated FROM contents LEFT JOIN users ON user_id = users.id ORDER BY created DESC LIMIT ?, 10;",
     [startIndex],
     (err, contents) => {
       if (err) throw err;
@@ -72,7 +72,7 @@ router.get("/page", (req, res) => {
 /* CREATE CONTENT */
 /* /api/content/create */
 router.post("/create", function (req, res) {
-  let author = req.body.author;
+  let user_id = req.body.user_id;
   let title = req.body.title;
   let description = req.body.description;
 
@@ -80,8 +80,8 @@ router.post("/create", function (req, res) {
   connection.connect();
 
   connection.query(
-    "INSERT INTO contents (title, description, author, created, updated) VALUES(?, ?, ?, NOW(), NOW())",
-    [title, description, author],
+    "INSERT INTO contents (title, description, user_id, created, updated) VALUES(?, ?, ?, NOW(), NOW())",
+    [title, description, user_id],
     (err) => {
       if (err) throw err;
       connection.end();
@@ -134,7 +134,7 @@ router.get("/get_by_author", function (req, res) {
   console.log(author);
   let connection = mysql.createConnection(dbConfig);
   connection.query(
-    `SELECT * FROM contents WHERE author=? ORDER BY created DESC`,
+    `SELECT * FROM contents WHERE user_id=? ORDER BY created DESC`,
     [author],
     (err, contents) => {
       if (err) throw err;

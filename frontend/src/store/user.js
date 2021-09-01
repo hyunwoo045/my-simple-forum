@@ -3,6 +3,7 @@ export default {
 
   state: () => {
     return {
+      isLoggedIn: false,
       id: -1,
       username: "",
       writable: false,
