@@ -43,7 +43,7 @@
         <div
           class="comment-area inputs"
           v-else>
-          로그인하세요
+          로그인 후 댓글을 작성해 주세요!
         </div>
 
         <div class="comment-area comments">
@@ -87,21 +87,9 @@ export default {
     /* 
       로그인 세션 확인하기
     */
-    const token = localStorage.getItem('accessToken');
-    this.$http.get(`${defaultAPI.end_point}/auth/check?token=${token}`)
-    .then(response => {
-      const data = response.data;
-      if (data.message === "VALID_TOKEN") {
-        const nickname = data.decoded.nickname;
-        const user_id = data.decoded.user_id;
-        this.$store.commit('user/setState', { nickname, user_id });
-        // ACCESS TOKEN 다시 받아야 함.
-
-      } else if (data.message === "NOT_VALID_ACCESS_TOKEN") {
-        // REFRESH 토근 확인하고 분기 나눠야 함.
-        console.log("CHECK REFRESH TOKEN")
-      }
-    })
+    if (!this.$store.state.user.isLoggedIn && !this.$store.state.user.tokenChecked) {
+      this.$router.push('/auth-check');
+    }
 
     /*
       글 정보 가져온 후에 댓글 목록 가져오기
@@ -135,7 +123,7 @@ export default {
   },
   methods: {
     modifyHandler() {
-      if (!this.thisUserUpdatable) {
+      if (this.contentAuthor !== this.$store.state.user.username) {
         alert('수정 권한이 없습니다.');
         return
       }

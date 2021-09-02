@@ -4,6 +4,7 @@ export default {
   state: () => {
     return {
       isLoggedIn: false,
+      tokenChecked: false,
       id: -1,
       username: "",
     };
@@ -17,6 +18,7 @@ export default {
     },
     resetState(state) {
       state.isLoggedIn = false;
+      state.tokenChecked = false;
       state.username = "";
       state.id = -1;
     },

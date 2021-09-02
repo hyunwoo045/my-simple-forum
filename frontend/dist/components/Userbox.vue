@@ -4,40 +4,28 @@
       <div
         class="username"
         v-if="!toggler">
-        {{ username }}
-      </div>
-      <div
-        class="username change"
-        v-else>
-        <input
-          type="text"
-          maxlength="11"
-          v-model="curName"
-          @keyup.enter="toggleUsername" />
-      </div>
-      <div
-        class="change-username"
-        @click="toggleUsername">
-        수정
+        {{ $store.state.user.isLoggedIn ? username : '로그인이 필요합니다.' }}
       </div>
     </div>
 
     <div class="button-area">
-      <RouterLink
-        class="btn write"
-        :to="{ name: 'Add', params: { mode: 'add' } }">
-        글쓰기
-      </RouterLink>
       <div
-        class="btn search-my"
-        @click="searchMyContents">
-        내가 쓴 글
-      </div>
-      <div
-        class="btn search-all"
+        class="btn"
         @click="searchAllContents">
         전체 글
       </div>
+      <div
+        class="btn"
+        v-if="$store.state.user.isLoggedIn"
+        @click="searchMyContents">
+        내가 쓴 글
+      </div>
+      <RouterLink
+        class="btn green"
+        v-if="$store.state.user.isLoggedIn"
+        :to="{ name: 'Add', params: { mode: 'add' } }">
+        글쓰기
+      </RouterLink>
     </div>
   </div>
 </template>
@@ -71,7 +59,7 @@ export default {
       this.$router.push({
         name: "Home",
         query: {
-          author: this.$store.state.user.username,
+          user_id: this.$store.state.user.id,
         }
       });
     },
@@ -97,7 +85,6 @@ export default {
     .username {
       padding: 0 20px;
       font-size: 19px;
-      width: 190px;
       box-sizing: border-box;
       &.change {
         input {
@@ -112,38 +99,13 @@ export default {
       cursor: pointer;
     }
   }
-
   .button-area {
     display: flex;
     position: relative;
     .btn {
-      border: 1px solid black;
-      border-radius: 4px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 90px;
-      height: 40px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 700;
       margin-right: 4px;
-      transition: 0.3s;
-      &:hover {
-        background-color: rgb(143, 143, 143);
-        color: #fff;
-      }
       &:last-child {
         margin: 0;
-      }
-      &.write {
-        background-color: rgb(0, 165, 0);
-        color: #fff;
-        text-decoration: none;
-        &:hover {
-          background-color: #fff;
-          color: rgb(0, 165, 0);
-        }
       }
     }
   }

@@ -1,1 +1,1 @@
-export default{namespaced:!0,state:()=>({username:"Guest",contents:[]}),mutations:{setUsername(e,t){e.username=t.newName},setContents(e,t){e.contents=t.contents}}};
+export default{namespaced:!0,state:()=>({isLoggedIn:!1,tokenChecked:!1,id:-1,username:""}),mutations:{setState(e,t){const{user_id:n,nickname:s}=t;e.isLoggedIn=!0,e.username=s,e.id=n},resetState(e){e.isLoggedIn=!1,e.tokenChecked=!1,e.username="",e.id=-1}}};

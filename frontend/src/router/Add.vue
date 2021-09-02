@@ -38,6 +38,11 @@
 <script>
 import defaultAPI from '~/core/defaultAPI';
 export default {
+  created() {
+    if (!this.$store.state.user.isLoggedIn && !this.$store.state.user.tokenChecked) {
+      this.$router.push('/');
+    }
+  },
   name: 'Add',
   props: {
     mode: {

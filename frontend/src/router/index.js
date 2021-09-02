@@ -4,6 +4,7 @@ import Add from "./Add";
 import Read from "./Read";
 import Login from "./Login";
 import Signin from "./Signin";
+import SessionCheck from "./SessionCheck";
 
 export default createRouter({
   history: createWebHashHistory(),
@@ -34,6 +35,11 @@ export default createRouter({
       path: "/signin",
       component: Signin,
       name: "Signin",
+    },
+    {
+      path: "/auth-check",
+      component: SessionCheck,
+      name: "SessionCheck",
     },
   ],
 });
