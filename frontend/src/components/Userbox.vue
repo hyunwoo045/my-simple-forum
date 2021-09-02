@@ -4,22 +4,8 @@
       <div
         class="username"
         v-if="!toggler">
-        {{ $store.state.user.writable ? username : '로그인이 필요합니다.' }}
+        {{ $store.state.user.isLoggedIn ? username : '로그인이 필요합니다.' }}
       </div>
-      <!-- <div
-        class="username change"
-        v-else>
-        <input
-          type="text"
-          maxlength="11"
-          v-model="curName"
-          @keyup.enter="toggleUsername" />
-      </div> -->
-      <!-- <div
-        class="change-username"
-        @click="toggleUsername">
-        수정
-      </div> -->
     </div>
 
     <div class="button-area">
@@ -30,13 +16,13 @@
       </div>
       <div
         class="btn"
-        v-if="$store.state.user.writable"
+        v-if="$store.state.user.isLoggedIn"
         @click="searchMyContents">
         내가 쓴 글
       </div>
       <RouterLink
         class="btn green"
-        v-if="$store.state.user.writable"
+        v-if="$store.state.user.isLoggedIn"
         :to="{ name: 'Add', params: { mode: 'add' } }">
         글쓰기
       </RouterLink>
@@ -73,7 +59,7 @@ export default {
       this.$router.push({
         name: "Home",
         query: {
-          author: this.$store.state.user.id,
+          user_id: this.$store.state.user.id,
         }
       });
     },

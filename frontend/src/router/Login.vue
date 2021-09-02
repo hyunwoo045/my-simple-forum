@@ -75,22 +75,26 @@ export default {
         this.passwordErr = true;
         return;
       }
-
-      this.$http.post(`${defaultAPI.end_point}/user/login`, 
+      this.$http.post(`${defaultAPI.end_point}/auth/login`, 
       { 
         email: this.inputs.email,
         password: this.inputs.password,
       }).then(response => {
-        if (response.data.length === 0) {
+        if (response.data === "NOT_FOUND_EMAIL") {
+          this.inputErr = true;
+          this.resetInputs();
+        } else if (response.data === "NOT_VALID_PASSWORD") {
           this.inputErr = true;
           this.resetInputs();
         } else {
-          const nickname = response.data[0].nickname;
-          const id = response.data[0].id;
-          this.$store.commit('user/setUsername', {
-            id,
-            nickname
-          });
+/*
+  여기서부터 JWT token을 사용하기 시작해야 함.
+  localStorage 를 이용해서 Session을 유지해야 함.
+*/
+          console.log(response.data);
+          localStorage.setItem('accessToken', response.data.accessToken);
+          alert('로그인 성공!');
+          this.$store.commit('user/setState', response.data.payload)
           this.$router.push('/');
         }
       })

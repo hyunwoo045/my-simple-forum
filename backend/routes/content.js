@@ -2,14 +2,12 @@ let express = require("express");
 let mysql = require("mysql");
 var url = require("url");
 let router = express.Router();
-let dbkey = require("../key/dbkey");
-
-const dbConfig = new dbkey().config;
+let dbconfig = require("../key/dbkey");
 
 /* READ CONTENTS */
 /* /api/content | /api/content?id=[] */
 router.get("/", (req, res) => {
-  let connection = mysql.createConnection(dbConfig);
+  let connection = mysql.createConnection(dbconfig);
   connection.connect();
 
   let _url = req.url;
@@ -17,7 +15,7 @@ router.get("/", (req, res) => {
   let id = queryData.id;
   if (id === undefined) {
     connection.query(
-      "SELECT contents.id, user_id, users.nickname AS author, title, description, created, updated FROM contents LEFT JOIN users ON user_id = users.id ORDER BY created DESC LIMIT 0, 10;",
+      "SELECT contents.id, user_id, user.nickname AS author, title, description, created, updated FROM contents LEFT JOIN user ON user_id = user.id ORDER BY created DESC LIMIT 0, 10;",
       (err, topics) => {
         if (err) throw err;
         connection.query(
@@ -36,7 +34,7 @@ router.get("/", (req, res) => {
     );
   } else {
     connection.query(
-      "SELECT contents.id, user_id, users.nickname AS author, title, description, created, updated FROM contents LEFT JOIN users ON user_id = users.id WHERE contents.id=? ORDER BY created DESC LIMIT 0, 10;",
+      "SELECT contents.id, user_id, user.nickname AS author, title, description, created, updated FROM contents LEFT JOIN user ON user_id = user.id WHERE contents.id=? ORDER BY created DESC LIMIT 0, 10;",
       [id],
       (err, topics) => {
         if (err) throw err;
@@ -50,7 +48,7 @@ router.get("/", (req, res) => {
 /* READ MORE CONTENTS */
 /* /api/content/page?page={} */
 router.get("/page", (req, res) => {
-  let connection = mysql.createConnection(dbConfig);
+  let connection = mysql.createConnection(dbconfig);
   connection.connect();
 
   let _url = req.url;
@@ -59,7 +57,7 @@ router.get("/page", (req, res) => {
   let startIndex = pageNumber * 10;
 
   connection.query(
-    "SELECT contents.id, user_id, users.nickname AS author, title, description, created, updated FROM contents LEFT JOIN users ON user_id = users.id ORDER BY created DESC LIMIT ?, 10;",
+    "SELECT contents.id, user_id, user.nickname AS author, title, description, created, updated FROM contents LEFT JOIN user ON user_id = user.id ORDER BY created DESC LIMIT ?, 10;",
     [startIndex],
     (err, contents) => {
       if (err) throw err;
@@ -76,7 +74,7 @@ router.post("/create", function (req, res) {
   let title = req.body.title;
   let description = req.body.description;
 
-  let connection = mysql.createConnection(dbConfig);
+  let connection = mysql.createConnection(dbconfig);
   connection.connect();
 
   connection.query(
@@ -97,7 +95,7 @@ router.post("/modify", function (req, res) {
   let title = req.body.title;
   let description = req.body.description;
 
-  let connection = mysql.createConnection(dbConfig);
+  let connection = mysql.createConnection(dbconfig);
   connection.connect();
 
   connection.query(
@@ -115,7 +113,7 @@ router.post("/modify", function (req, res) {
 /* /api/content/delete */
 router.post("/delete", function (req, res) {
   let id = req.body.id;
-  let connection = mysql.createConnection(dbConfig);
+  let connection = mysql.createConnection(dbconfig);
   connection.connect();
 
   connection.query(`DELETE FROM contents WHERE id=?`, [id], (err) => {
@@ -130,12 +128,11 @@ router.post("/delete", function (req, res) {
 router.get("/get_by_author", function (req, res) {
   const _url = req.url;
   const queryData = url.parse(_url, true).query;
-  const author = queryData.author;
-  console.log(author);
-  let connection = mysql.createConnection(dbConfig);
+  const user_id = queryData.user_id;
+  let connection = mysql.createConnection(dbconfig);
   connection.query(
-    `SELECT * FROM contents WHERE user_id=? ORDER BY created DESC`,
-    [author],
+    "SELECT contents.id, user_id, user.nickname AS author, title, description, created, updated FROM contents LEFT JOIN user ON user_id = user.id WHERE user_id=? ORDER BY created DESC LIMIT ?, 10;",
+    [user_id],
     (err, contents) => {
       if (err) throw err;
       connection.end();

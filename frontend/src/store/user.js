@@ -6,15 +6,19 @@ export default {
       isLoggedIn: false,
       id: -1,
       username: "",
-      writable: false,
     };
   },
   mutations: {
-    setUsername(state, payload) {
-      const { id, nickname } = payload;
-      state.id = id;
+    setState(state, payload) {
+      const { user_id, nickname } = payload;
+      state.isLoggedIn = true;
       state.username = nickname;
-      state.writable = true;
+      state.id = user_id;
+    },
+    resetState(state) {
+      state.isLoggedIn = false;
+      state.username = "";
+      state.id = -1;
     },
   },
 };

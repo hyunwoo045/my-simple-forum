@@ -53,8 +53,29 @@
 
 <script>
 import defaultAPI from '~/core/defaultAPI'
+
 export default {
   created() {
+    /* 
+      로그인 세션 확인하기
+    */
+    const token = localStorage.getItem('accessToken');
+    this.$http.get(`${defaultAPI.end_point}/auth/check?token=${token}`)
+    .then(response => {
+      const data = response.data;
+      if (data.message === "VALID_TOKEN") {
+        const nickname = data.decoded.nickname;
+        const user_id = data.decoded.user_id;
+        this.$store.commit('user/setState', { nickname, user_id });
+      } else if (data.message === "NOT_VALID_ACCESS_TOKEN") {
+        console.log("ACCESS TOKEN 만료. REFRESH 토큰 확인.")
+      }
+    })
+
+    /* 
+      DB로부터 글 목록 가져오기.
+      author query가 정의되어 있으면 작성자=author 로 필터링
+    */
     if (this.$route.query.author === undefined) {
       this.$http.get(`${defaultAPI.end_point}/content`).then((response) => {
         this.contents = response.data.topics;

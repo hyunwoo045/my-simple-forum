@@ -76,25 +76,17 @@ export default {
   },
   methods: {
     submitHandler() {
-      this.$http.post(`${defaultAPI.end_point}/user`, { inputs : this.inputs })
-      .then(response => {
-        console.log(response);
-        const resCode = response.data.code;
-        if (resCode !== "OK") {
-          if (resCode === "ER_DUP_ENTRY") { // 중복 이메일 혹은 닉네임
-            const resSqlMessage = response.data.sqlMessage;
-            const resSqlMessageSplitList = resSqlMessage.split(' ');
-            const dupType = resSqlMessageSplitList[resSqlMessageSplitList.length - 1]
-            console.log(dupType);
-            if (dupType === "'uq_email'") {
-              this.emailErr = true;
-            } else if (dupType ==="'uq_nickname'") {
-              this.nicknameErr = true;
-            }
-          }
-        } else {
+      this.$http.post(`${defaultAPI.end_point}/auth/register`,{ inputs: this.inputs })
+      .then(res => {
+        if (res.data === "DUP_EMAIL") {
+          this.emailErr = true;
+        } else if (res.data === "DUP_NICKNAME") {
+          this.nicknameErr = true;
+        } else if (res.data === "OK") {
           alert('회원가입에 성공하였습니다.');
           this.$router.push('/login');
+        } else {
+          throw res.data;
         }
       })
     }
