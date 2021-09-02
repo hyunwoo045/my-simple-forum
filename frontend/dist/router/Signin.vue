@@ -41,9 +41,11 @@
       </div>
     </div>
     <div class="btn-area">
-      <div class="btn">
-        취소
-      </div>
+      <RouterLink to="/login">
+        <div class="btn">
+          취소
+        </div>
+      </RouterLink>
       <div
         class="btn"
         @click="submitHandler">
