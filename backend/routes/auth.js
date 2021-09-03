@@ -10,11 +10,12 @@ router.post("/login", async (req, res) => {
   try {
     if (await User.findOneByEmail(email)) {
       const userPayload = await User.verify(email, password);
-      console.log(userPayload);
-      const token = await JWTController.accessGenerate(userPayload);
+      const accessToken = await JWTController.accessGenerate(userPayload);
+      const refreshToken = await JWTController.refreshGenerate(userPayload);
       res.send({
         payload: userPayload,
-        accessToken: token,
+        accessToken,
+        refreshToken,
       });
     } else {
       res.send("NOT_FOUND_EMAIL");
@@ -47,16 +48,73 @@ router.get("/check", async (req, res) => {
   const _url = req.url;
   const queryData = url.parse(_url, true).query;
   const token = queryData.token;
-  console.log(token);
+
   try {
     const decoded = await JWTController.accessVerify(token);
+    const { user_id, email, nickname, age, introduction } = decoded;
+
+    const newAccessToken = await JWTController.accessGenerate({
+      user_id,
+      email,
+      nickname,
+      age,
+      introduction,
+    });
+    const newRefreshToken = await JWTController.refreshGenerate({
+      user_id,
+      email,
+      nickname,
+      age,
+      introduction,
+    });
+
     res.send({
       message: "VALID_TOKEN",
-      token,
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
       decoded,
     });
   } catch (err) {
-    res.send(err);
+    res.send({
+      message: err,
+    });
+  }
+});
+
+router.get("/check_refresh", async (req, res) => {
+  const _url = req.url;
+  const queryData = url.parse(_url, true).query;
+  const token = queryData.token;
+
+  try {
+    const decoded = await JWTController.refreshVerify(token);
+    const { user_id, email, nickname, age, introduction } = decoded;
+
+    const newAccessToken = await JWTController.accessGenerate({
+      user_id,
+      email,
+      nickname,
+      age,
+      introduction,
+    });
+    const newRefreshToken = await JWTController.refreshGenerate({
+      user_id,
+      email,
+      nickname,
+      age,
+      introduction,
+    });
+
+    res.send({
+      message: "VALID_REFRESH_TOKEN",
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+      decoded,
+    });
+  } catch (err) {
+    res.send({
+      message: err,
+    });
   }
 });
 module.exports = router;

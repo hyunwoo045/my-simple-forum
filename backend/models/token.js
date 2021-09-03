@@ -1,16 +1,15 @@
 const jwt = require("jsonwebtoken");
-const accessKey = require("../key/secretKey");
+const jwtSecret = require("../key/secretKey");
 
-const accessSecert = accessKey.secret;
-const accessOption = accessKey.option;
-// const { refreshSecret, refreshOption } = refreshKey;
+const secret = jwtSecret.secret;
+const accessOption = jwtSecret.accessOption;
+const refreshOption = jwtSecret.refreshOption;
 
 const JWTController = {
   accessGenerate: (payload) => {
     return new Promise((resolve, reject) => {
-      jwt.sign(payload, accessSecert, accessOption, (err, token) => {
-        console.log(token);
-        if (err) reject(err);
+      jwt.sign(payload, secret, accessOption, (err, token) => {
+        if (err) reject("FAILED_AT_GENERATE");
         resolve(token);
       });
     });
@@ -18,8 +17,25 @@ const JWTController = {
   accessVerify: (token) => {
     return new Promise((resolve, reject) => {
       if (!token) reject("NEED_LOGIN");
-      jwt.verify(token, accessSecert, (err, decoded) => {
+      jwt.verify(token, secret, (err, decoded) => {
         if (err) reject("NOT_VALID_ACCESS_TOKEN");
+        resolve(decoded);
+      });
+    });
+  },
+  refreshGenerate: (payload) => {
+    return new Promise((resolve, reject) => {
+      jwt.sign(payload, secret, refreshOption, (err, token) => {
+        if (err) reject("FAILED_RT_GENERATE");
+        resolve(token);
+      });
+    });
+  },
+  refreshVerify: (token) => {
+    return new Promise((resolve, reject) => {
+      if (!token) reject("NEED_LOGIN");
+      jwt.verify(token, secret, (err, decoded) => {
+        if (err) reject("NOT_VALID_REFRESH_TOKEN");
         resolve(decoded);
       });
     });

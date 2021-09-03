@@ -34,7 +34,9 @@ export default {
   methods: {
     logoutHandler() {
       localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken')
       this.$store.commit('user/resetState');
+      this.$router.push('/');
     }
   }
 }
