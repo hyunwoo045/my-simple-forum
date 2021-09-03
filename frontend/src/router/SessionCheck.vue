@@ -22,7 +22,6 @@ export default {
       */
       this.$http.get(`${defaultAPI.end_point}/auth/check?token=${token}`)
       .then(response => {
-        console.log("ACCESS TOKEN: ", response)
         const data = response.data;
         if (data.message === "VALID_TOKEN") {
           const nickname = data.decoded.nickname;
@@ -40,7 +39,6 @@ export default {
           */
           const curRefreshToken = localStorage.getItem('refreshToken');
           this.$http.get(`${defaultAPI.end_point}/auth/check_refresh?token=${curRefreshToken}`).then(response => {
-            console.log('REFRESH TOKEN: ');
             const data = response.data;
             if (data.message === "VALID_REFRESH_TOKEN") {
               const nickname = data.decoded.nickname;

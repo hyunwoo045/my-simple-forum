@@ -131,7 +131,7 @@ router.get("/get_by_author", function (req, res) {
   const user_id = queryData.user_id;
   let connection = mysql.createConnection(dbconfig);
   connection.query(
-    "SELECT contents.id, user_id, user.nickname AS author, title, description, created, updated FROM contents LEFT JOIN user ON user_id = user.id WHERE user_id=? ORDER BY created DESC LIMIT ?, 10;",
+    "SELECT contents.id, user_id, user.nickname AS author, title, description, created, updated FROM contents LEFT JOIN user ON user_id = user.id WHERE user_id=? ORDER BY created DESC LIMIT 0, 10;",
     [user_id],
     (err, contents) => {
       if (err) throw err;
