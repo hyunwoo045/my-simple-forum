@@ -87,9 +87,17 @@ export default {
     /* 
       로그인 세션 확인하기
     */
-    if (!this.$store.state.user.isLoggedIn && !this.$store.state.user.tokenChecked) {
-      this.$router.push('/auth-check');
-    }
+    this.$store.dispatch("user/AccessTokenHandler").then(res => {
+      if (res === "NOT_VALID_ACCESS_TOKEN") {
+        this.$store.dispatch("user/RefreshTokenHandler").then(res => {
+          if (res === "NOT_VALID_REFRESH_TOKEN") {
+            this.$store.commit("user/resetState");
+          }
+        })
+      } else if (res === "NEED_LOGIN") {
+        this.$store.commit("user/resetState");
+      }
+    });
 
     /*
       글 정보 가져온 후에 댓글 목록 가져오기
