@@ -42,9 +42,20 @@ export default {
     /*
       글 쓰기/생성 페이지에서는 새로고침 시 즉시 홈 화면으로 날아갑니다.
     */
-    if (!this.$store.state.user.isLoggedIn && !this.$store.state.user.tokenChecked) {
+    if (!this.$store.state.user.isLoggedIn) {
       this.$router.push('/');
     }
+    this.$store.dispatch("user/AccessTokenHandler").then(res => {
+      if (res === "NOT_VALID_ACCESS_TOKEN") {
+        this.$store.dispatch("user/RefreshTokenHandler").then(res => {
+          if (res === "NOT_VALID_REFRESH_TOKEN") {
+            this.$store.commit("user/resetState");
+          }
+        })
+      } else if (res === "NEED_LOGIN") {
+        this.$store.commit("user/resetState");
+      }
+    });
   },
   name: 'Add',
   props: {
