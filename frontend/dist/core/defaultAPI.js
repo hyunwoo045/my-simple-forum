@@ -1,1 +1,1 @@
-const defaultAPI={end_point:"http://3.36.99.250/api"};module.exports=defaultAPI;
+const defaultAPI={end_point:"http://54.180.128.41/api"};module.exports=defaultAPI;

@@ -39,6 +39,9 @@
 import defaultAPI from '~/core/defaultAPI';
 export default {
   created() {
+    /*
+      글 쓰기/생성 페이지에서는 새로고침 시 즉시 홈 화면으로 날아갑니다.
+    */
     if (!this.$store.state.user.isLoggedIn && !this.$store.state.user.tokenChecked) {
       this.$router.push('/');
     }

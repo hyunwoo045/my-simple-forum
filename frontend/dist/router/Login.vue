@@ -80,6 +80,7 @@ export default {
         email: this.inputs.email,
         password: this.inputs.password,
       }).then(response => {
+        console.log(response);
         if (response.data === "NOT_FOUND_EMAIL") {
           this.inputErr = true;
           this.resetInputs();
@@ -87,14 +88,18 @@ export default {
           this.inputErr = true;
           this.resetInputs();
         } else {
-/*
-  여기서부터 JWT token을 사용하기 시작해야 함.
-  localStorage 를 이용해서 Session을 유지해야 함.
-*/
-          console.log(response.data);
+          /*
+            여기서부터 JWT token을 사용하기 시작해야 함.
+            localStorage 를 이용해서 Session을 유지해야 함.
+          */
           localStorage.setItem('accessToken', response.data.accessToken);
+          localStorage.setItem('refreshToken', response.data.refreshToken)
+          const userPayload = {
+            user_id: response.data.user_id,
+            nickname: response.data.nickname,
+          }
           alert('로그인 성공!');
-          this.$store.commit('user/setState', response.data.payload)
+          this.$store.commit('user/setState', userPayload)
           this.$router.push('/');
         }
       })

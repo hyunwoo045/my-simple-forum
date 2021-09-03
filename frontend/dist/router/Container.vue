@@ -57,20 +57,8 @@ import defaultAPI from '~/core/defaultAPI'
 export default {
   created() {
     /* 
-      로그인 세션 확인하기
+      로그인 세션 확인
     */
-    // const token = localStorage.getItem('accessToken');
-    // this.$http.get(`${defaultAPI.end_point}/auth/check?token=${token}`)
-    // .then(response => {
-    //   const data = response.data;
-    //   if (data.message === "VALID_TOKEN") {
-    //     const nickname = data.decoded.nickname;
-    //     const user_id = data.decoded.user_id;
-    //     this.$store.commit('user/setState', { nickname, user_id });
-    //   } else if (data.message === "NOT_VALID_ACCESS_TOKEN") {
-    //     console.log("ACCESS TOKEN 만료. REFRESH 토큰 확인.")
-    //   }
-    // })
     if (!this.$store.state.user.isLoggedIn && !this.$store.state.user.tokenChecked) {
       this.$router.push('/auth-check');
     }
@@ -80,15 +68,15 @@ export default {
       DB로부터 글 목록 가져오기.
       author query가 정의되어 있으면 작성자=author 로 필터링
     */
-    if (this.$route.query.author === undefined) {
+    if (this.$route.query.user_id === undefined) {
       this.$http.get(`${defaultAPI.end_point}/content`).then((response) => {
         this.contents = response.data.topics;
         this.maxPageNumber = Math.ceil(response.data.length / 10);
       });
     } else {
       this.$http.get(
-        `${defaultAPI.end_point}/content/get_by_author?author=${this.$route.query.author}`)
-        .then(response => {
+        `${defaultAPI.end_point}/content/get_by_author?user_id=${this.$route.query.user_id}`)
+      .then(response => {
         this.contents = response.data;
       });
     }
