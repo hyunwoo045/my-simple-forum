@@ -33,10 +33,13 @@
 export default {
   methods: {
     logoutHandler() {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken')
-      this.$store.commit('user/resetState');
-      this.$router.push('/');
+      if (confirm("로그아웃 하시겠습니까?")) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken')
+        this.$store.commit('user/resetState');
+        this.$router.push('/');
+      }
+      return;
     }
   }
 }

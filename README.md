@@ -810,6 +810,10 @@ crypto.pbkdf2("입력비밀번호", `기존salt`, 100000, 64, "sha512", (err, ke
 });
 ```
 
+소금도 그냥 친다고 다 되는 것이 아니니 아래 글을 나중에 꼭 읽어보도록 합니다.
+
+[비밀번호 해시에 소금치기 바르게 쓰기](https://starplatina.tistory.com/entry/%EB%B9%84%EB%B0%80%EB%B2%88%ED%98%B8-%ED%95%B4%EC%8B%9C%EC%97%90-%EC%86%8C%EA%B8%88%EC%B9%98%EA%B8%B0-%EB%B0%94%EB%A5%B4%EA%B2%8C-%EC%93%B0%EA%B8%B0)
+
 ## <br/>
 
 ## 데이터베이스

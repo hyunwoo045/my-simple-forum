@@ -1,8 +1,18 @@
 const mysql = require("mysql");
+const crypto = require("crypto");
+
 const dbconfig = require("../key/dbkey");
 const conn = mysql.createConnection(dbconfig);
 
 const User = {
+  createHashPassword: (nickname, password) => {
+    return new Promise((resolve, reject) => {
+      crypto.pbkdf2(password, nickname, 110317, 64, "sha512", (err, key) => {
+        if (err) reject(err);
+        resolve(key.toString("base64"));
+      });
+    });
+  },
   create: (email, username, password) => {
     return new Promise((resolve, reject) => {
       conn.query(
@@ -17,24 +27,24 @@ const User = {
       );
     });
   },
-  verify: (email, password) => {
-    return new Promise(function (resolve, reject) {
-      conn.query("SELECT * FROM user WHERE email=?", [email], (err, result) => {
-        if (err) reject(err);
-        else {
-          if (result[0].password === password)
-            resolve({
-              user_id: result[0].id,
-              email: result[0].email,
-              nickname: result[0].nickname,
-              age: result[0].age,
-              introduction: result[0].introduction,
-            });
-          else reject("NOT_VALID_PASSWORD");
-        }
-      });
-    });
-  },
+  // verify: (email, password) => {
+  //   return new Promise(function (resolve, reject) {
+  //     conn.query("SELECT * FROM user WHERE email=?", [email], (err, result) => {
+  //       if (err) reject(err);
+  //       else {
+  //         if (result[0].password === password)
+  //           resolve({
+  //             user_id: result[0].id,
+  //             email: result[0].email,
+  //             nickname: result[0].nickname,
+  //             age: result[0].age,
+  //             introduction: result[0].introduction,
+  //           });
+  //         else reject("NOT_VALID_PASSWORD");
+  //       }
+  //     });
+  //   });
+  // },
   findOneByUsername: (username) => {
     return new Promise((resolve, reject) => {
       conn.query(
@@ -43,7 +53,7 @@ const User = {
         (err, result) => {
           if (err) reject(err);
           else {
-            if (result[0].length !== 0) resolve(true);
+            if (result[0].length !== 0) reject("DUP_NICKNAME");
             else resolve(false);
           }
         }
@@ -58,11 +68,29 @@ const User = {
         (err, result) => {
           if (err) reject(err);
           else {
-            if (result[0].length !== 0) resolve(true);
-            else resolve(false);
+            if (result[0].length !== 0) reject("DUP_EMAIL");
+            else resolve();
           }
         }
       );
+    });
+  },
+  getUserInfo: (email) => {
+    return new Promise((resolve, reject) => {
+      conn.query("SELECT * FROM user WHERE email=?", [email], (err, result) => {
+        if (err) reject(err);
+        else if (result.length === 0) reject("NOT_FOUND_EMAIL");
+        else {
+          resolve({
+            user_id: result[0].id,
+            email: result[0].email,
+            nickname: result[0].nickname,
+            dbPassword: result[0].password,
+            age: result[0].age,
+            introduction: result[0].introduction,
+          });
+        }
+      });
     });
   },
 };

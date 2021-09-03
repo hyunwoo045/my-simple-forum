@@ -91,6 +91,7 @@ export default {
 
       this.$http.post(`${defaultAPI.end_point}/auth/register`,{ inputs: this.inputs })
       .then(res => {
+        console.log(res.data);
         if (res.data === "DUP_EMAIL") {
           this.emailErr = true;
         } else if (res.data === "DUP_NICKNAME") {
