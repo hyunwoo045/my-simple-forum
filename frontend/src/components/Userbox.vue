@@ -2,12 +2,10 @@
   <div class="userbox">
     <div class="user-info">
       <div
-        class="username"
-        v-if="!toggler">
-        {{ $store.state.user.isLoggedIn ? username : '로그인이 필요합니다.' }}
+        class="username">
+        {{ username }}
       </div>
     </div>
-
     <div class="button-area">
       <div
         class="btn"
@@ -16,13 +14,11 @@
       </div>
       <div
         class="btn"
-        v-if="$store.state.user.isLoggedIn"
         @click="searchMyContents">
         내가 쓴 글
       </div>
       <RouterLink
         class="btn green"
-        v-if="$store.state.user.isLoggedIn"
         :to="{ name: 'Add', params: { mode: 'add' } }">
         글쓰기
       </RouterLink>
@@ -32,32 +28,15 @@
 
 <script>
 export default {
-  created() {
-    this.curName = this.$store.state.user.username;
-  },
-  data() {
-    return {
-      toggler: false,
-      curName: '',
-    }
-  },
   computed: {
     username() {
       return this.$store.state.user.username;
     }
   },
   methods: {
-    toggleUsername() {
-      if (this.toggler) {
-        this.$store.commit('user/setUsername', {
-          newName: this.curName
-        });
-      }
-      this.toggler = !this.toggler;
-    },
     searchMyContents() {
       this.$router.push({
-        name: "Home",
+        name: "Container",
         query: {
           user_id: this.$store.state.user.id,
         }

@@ -120,6 +120,9 @@ export default {
 <style lang="scss" scoped>
 @import "~/scss/main";
 
+.container {
+  margin-top: 150px;
+}
 .headline {
   height: 250px;
   display: flex;

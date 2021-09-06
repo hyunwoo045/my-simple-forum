@@ -1,24 +1,9 @@
 <template>
-  <div>
-    <header>
-      <Header />
-    </header>
-    <section>
-      <Userbox />
-      <RouterView :key="$route.fullPath" />
-    </section>
-  </div>
+  <RouterView />
 </template>
 
 <script>
-import Header from '~/components/Header';
-import Userbox from '~/components/Userbox'
 export default ({
-  components: {
-    Userbox,
-    Header,
-  },
-
   data() {
     return {
       message: 'Hello Vue!'

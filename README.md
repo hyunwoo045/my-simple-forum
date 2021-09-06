@@ -17,6 +17,10 @@ Vue.js 와 데이터베이스(MySQL), 클라우드 서버(AWS) 학습을 주 목
   - [Webpack Proxy 설정](#Webpack-Proxy-설정)
   - [CORS issue](#CORS-issue)
   - [nginx 로 배포](#nginx-로-배포)
+  - [네비게이션 가드](#네비게이션-가드)
+    - [중첩된 라우트](#중첩된-라우트)
+    - [라우트별 가드](#라우트별-가드)
+    - [라우터에서 Store 사용하기](#라우터에서-Store-사용하기)
 - [Backend](#Backend)
   - [Nodejs MySQL](#Nodejs-MySQL)
   - [Express Generator](#Express-Generator)
@@ -596,6 +600,133 @@ $ sudo apt-get purge nginx nginx-common  # 전체 다 삭제
 $ sudo apt-get autoremove  # 종속성 관련 패키지 삭제
 $ rm -rf /etc/nginx
 ```
+
+<br/>
+
+### 네비게이션 가드
+
+회원가입, 로그인까지 모두 구현이 완료한 상태이고, 로그인을 하지 않더라도 글 목록 및 글 내용까지도 모두 확인할 수 있는 일반적인 웹 게시판이었습니다. 폐쇄적인 사이트, 즉 로그인을 하지 않으면 아예 이용 자체가 불가능한 사이트로 수정하라는 요구사항을 받았고, 그에 맞추어 라우팅 설계를 수정해보려 합니다.
+
+참고자료
+
+- [공식: 네비게이션 가드](https://router.vuejs.org/kr/guide/advanced/navigation-guards.html)
+- [공식: 중첩된 라우트](https://router.vuejs.org/kr/guide/essentials/nested-routes.html)
+- [라우터에서 Store 사용](https://minhanpark.github.io/today-i-learned/vue-router-guard/)
+
+현재 라우터의 설계는 `Header`와 `Userbox`가 고정되어 있고, 한 `RouterView` 안에 `List`, `Read`, `Add`, `Login`, `Signin` 모두 들어가 있는 상태입니다.
+
+간단히 그래프로 표현하면 아래와 같습니다.
+
+![라우트 그래프_전](./images/before.png)
+
+이걸 아래와 같이 수정해보려 합니다.
+
+![라우트 그래프_후](./images/after.png)
+
+그래프에 표현하지 않았지만 로그인이 되지 않으면 `Home` 으로 이동할 수 없는 구조로 만들어 폐쇄적인 사이트를 구현하도록 하겠습니다.
+
+### 중첩된 라우트
+
+전체를 감싸고 있는 router-view (그래프의 `app`) 안에 router-view 가 하나 더 있습니다. 이러한 형태를 vue 에서는 중첩된 라이트라고 표현을 합니다. 이를 구현하기 위해서는 `children` 이라는 키워드를 사용해야 합니다.
+
+```javascript
+// ./routes/index.js
+
+// import (...)
+export default createRouter({
+  routes: [
+    {
+      path: "/login"
+      component: Login,
+      name: "Login",
+    },
+    {
+      path: "/",
+      component: Home,
+      name: "Home",
+      /*
+        홈 View에 새로운 RouterView가 있게 하며
+        아래와 같은 Component 들이 연결되도록 합니다.
+      */
+      children: [
+        {
+          path: "",
+          component: List,
+          name: "List",
+        },
+        {
+          path: "add",
+          component: Add,
+          name: "Add",
+          props: true,
+        }
+      ]
+    }
+  ]
+})
+```
+
+### 라우트별 가드
+
+[네비게이션 가드](https://router.vuejs.org/kr/guide/advanced/navigation-guards.html) <- 해당 페이지에서 전역 가드 등 네비게이션 가드에 대한 모든, 자세한 내용을 참고하도록 하고 현재는 로그인이 되어 있지 않으면 `Home` 컴포넌트에 접근할 수 없도록 만들어야 하니 라우트 별 가드만을 기록하도록 하겠습니다.
+
+로그인을 검증하는 과정이 JWT의 내용이 들어가 있어 복잡한데 간단히 아래와 같이 라우팅을 억제할 수 있겠습니다.
+
+```javascript
+export default createRouter({
+  routes: [
+    {
+      path: "/",
+      component: Home,
+      name: "Home",
+      beforeEnter: (to, from, next) => {
+        if (!isLoggedIn) {
+          next("/login");
+        } else {
+          next();
+        }
+      },
+    },
+  ],
+});
+```
+
+부모 컴포넌트에 `beforeEnter` 가 적용되어 있으면 `children` 에도 모두 적용됩니다.
+
+### 라우터에서 Store 사용하기
+
+JWT을 검증하는 내용은 재사용성을 높히기 위해서 Store 에 모두 정의해둔 상태입니다. 기존에 각 Component의 Created에서 JWT를 각각 검증하도록 되어 있으나, 라우터 중첩에서 부모 컴포넌트에 `beforeEnter` 가 적용되어 있으면 자식들도 모두 적용된다는 특징을 이용하여 router에서 store를 직접 사용하도록 합니다.
+
+```javascript
+// import (...)
+import store from "../store/index";
+
+export default createRouter({
+  routes: [
+    {
+      path: "/",
+      component: Home,
+      name: "Home",
+      beforeEnter: (to, from, next) => {
+        if (!store.state.user.isLoggedIn) {
+          // ACCESS TOKEN 검증 -> REFRESH TOKEN 검증
+          store.dispatch("user/AccessTokenHandler").then((res) => {
+            if (res === "NOT_VALID_ACCESS_TOKEN") {
+              next("/login");
+            } else {
+              next();
+            }
+          });
+        }
+      },
+    },
+  ],
+});
+```
+
+위와 같이 store를 직접 import하여 그 안의 `state`와 `dispatch` 등의 모든 store의 기능을 사용할 수 있습니다.
+
+<br/>
 
 ---
 

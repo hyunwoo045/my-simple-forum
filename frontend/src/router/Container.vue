@@ -57,22 +57,6 @@ import defaultAPI from '~/core/defaultAPI'
 export default {
   created() {
     /* 
-      로그인 세션 확인
-    */
-    this.$store.dispatch("user/AccessTokenHandler").then(res => {
-      if (res === "NOT_VALID_ACCESS_TOKEN") {
-        this.$store.dispatch("user/RefreshTokenHandler").then(res => {
-          if (res === "NOT_VALID_REFRESH_TOKEN") {
-            this.$store.commit("user/resetState");
-          }
-        })
-      } else if (res === "NEED_LOGIN") {
-        this.$store.commit("user/resetState");
-      }
-    });
-    
-
-    /* 
       DB로부터 글 목록 가져오기.
       author query가 정의되어 있으면 작성자=author 로 필터링
     */
