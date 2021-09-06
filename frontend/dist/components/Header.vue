@@ -5,21 +5,7 @@
       class="logo">
       MY-SIMPLE-<span class="highlight">FORUM</span>
     </RouterLink>
-    <RouterLink
-      to="/login"
-      v-if="!$store.state.user.isLoggedIn">
-      <div class="btn">
-        LOGIN
-      </div>
-    </RouterLink>
-    <RouterLink
-      to="/signin"
-      v-if="!$store.state.user.isLoggedIn">
-      <div class="btn blue">
-        SIGNIN
-      </div>
-    </RouterLink>
-    <div v-else>
+    <div>
       <div
         class="btn"
         @click="logoutHandler()">
@@ -34,10 +20,8 @@ export default {
   methods: {
     logoutHandler() {
       if (confirm("로그아웃 하시겠습니까?")) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken')
         this.$store.commit('user/resetState');
-        this.$router.push('/');
+        this.$router.push('/login');
       }
       return;
     }

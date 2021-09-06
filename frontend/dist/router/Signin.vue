@@ -109,6 +109,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.container {
+  margin-top: 150px;
+}
 .headline {
   height: 120px;
   display: flex;
