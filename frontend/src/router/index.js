@@ -19,7 +19,10 @@ export default createRouter({
       name: "Login",
       beforeEnter: (to, from, next) => {
         if (store.state.user.isLoggedIn) {
+          alert("이미 로그인 되어 있습니다.");
           next("/");
+        } else {
+          next();
         }
       },
     },
@@ -29,7 +32,10 @@ export default createRouter({
       name: "Signin",
       beforeEnter: (to, from, next) => {
         if (store.state.user.isLoggedIn) {
+          alert("잘못된 경로 접근입니다.");
           next("/");
+        } else {
+          next();
         }
       },
     },
