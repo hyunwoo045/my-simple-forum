@@ -17,11 +17,21 @@ export default createRouter({
       path: "/login",
       component: Login,
       name: "Login",
+      beforeEnter: (to, from, next) => {
+        if (store.state.user.isLoggedIn) {
+          next("/");
+        }
+      },
     },
     {
       path: "/signin",
       component: Signin,
       name: "Signin",
+      beforeEnter: (to, from, next) => {
+        if (store.state.user.isLoggedIn) {
+          next("/");
+        }
+      },
     },
     {
       path: "/",
