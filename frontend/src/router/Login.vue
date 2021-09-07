@@ -82,7 +82,6 @@ export default {
         email: this.inputs.email,
         password: this.inputs.password,
       }).then(response => {
-        console.log(response);
         if (response.data === "NOT_FOUND_EMAIL") {
           this.inputErr = true;
           this.resetInputs();
