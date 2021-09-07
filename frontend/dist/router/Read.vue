@@ -133,7 +133,9 @@ export default {
   },
   computed: {
     cleanHTML() {
-      return sanitizeHTML(this.contentDescription);
+      return sanitizeHTML(this.contentDescription, {
+        allowedTags: sanitizeHTML.defaults.allowedTags.concat(['strike'])
+      });
     }
   },
   methods: {
