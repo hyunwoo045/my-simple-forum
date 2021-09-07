@@ -243,7 +243,9 @@ export default {
   padding: 30px 20px;
 
   .description {
-    white-space: pre;
+    p {
+      word-break: break-all;
+    }
   }
 }
 
