@@ -15,7 +15,7 @@
       </div>
       <div class="content-area-bottom">
         <div class="description">
-          <p v-html="contentDescription"></p>
+          <p v-html="cleanHTML"></p>
         </div>
       </div>
     </div>
@@ -82,6 +82,8 @@
 
 <script>
 import defaultAPI from '~/core/defaultAPI'
+import sanitizeHTML from 'sanitize-html';
+
 export default {
   created() {
     /* 
@@ -127,6 +129,11 @@ export default {
       comments: [],
       commentDescription: '',
       thisUserUpdatable: false,
+    }
+  },
+  computed: {
+    cleanHTML() {
+      return sanitizeHTML(this.contentDescription);
     }
   },
   methods: {
