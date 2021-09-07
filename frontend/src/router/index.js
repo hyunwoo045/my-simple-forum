@@ -44,28 +44,24 @@ export default createRouter({
       component: Home,
       name: "Home",
       beforeEnter: (to, from, next) => {
-        if (!store.state.user.isLoggedIn) {
-          store.dispatch("user/AccessTokenHandler").then((res) => {
-            if (res === "NOT_VALID_ACCESS_TOKEN") {
-              store.dispatch("user/RefreshTokenHandler").then((res) => {
-                if (res === "NOT_VALID_REFRESH_TOKEN") {
-                  store.commit("user/resetState");
-                  next("/login");
-                } else {
-                  next();
-                }
-              });
-            } else if (res === "NEED_LOGIN") {
-              store.commit("user/resetState");
-              next("/login");
-              return;
-            } else {
-              next();
-            }
-          });
-        } else {
-          next();
-        }
+        store.dispatch("user/AccessTokenHandler").then((res) => {
+          if (res === "NOT_VALID_ACCESS_TOKEN") {
+            store.dispatch("user/RefreshTokenHandler").then((res) => {
+              if (res === "NOT_VALID_REFRESH_TOKEN") {
+                store.commit("user/resetState");
+                next("/login");
+              } else {
+                next();
+              }
+            });
+          } else if (res === "NEED_LOGIN") {
+            store.commit("user/resetState");
+            next("/login");
+            return;
+          } else {
+            next();
+          }
+        });
       },
       children: [
         {

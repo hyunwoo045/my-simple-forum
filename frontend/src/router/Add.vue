@@ -11,12 +11,33 @@
           v-model="curTitle"
           placeholder="제목을 입력하세요." />
       </div>
-
       <div class="description">
-        <textarea
-          v-model="curDesc"
-          class="description"
-          placeholder="내용을 입력하세요."></textarea>
+        <div class="btn-area">
+          <button @click="styleHandler('bold')">
+            <b>B</b>
+          </button>
+          <button @click="styleHandler('italic')">
+            <i>I</i>
+          </button>
+          <button @click="styleHandler('underline')">
+            <u>U</u>
+          </button>
+          <button @click="styleHandler('strikeThrough')">
+            <s>S</s>
+          </button>
+          <button @click="styleHandler('insertOrderedList')">
+            ol
+          </button>
+          <button @click="styleHandler('insertUnorderedList')">
+            ul
+          </button>
+        </div>
+        <div
+          class="textarea"
+          contenteditable="true"
+          ref="desc">
+          <p v-html="description"></p>
+        </div>
       </div>
     </div>
     
@@ -71,7 +92,7 @@ export default {
       if (this.curTitle === '') {
         alert('제목을 입력하세요.');
         return;
-      } else if (this.curDesc === '') {
+      } else if (this.$refs.desc.innerHTML === '') {
         alert('내용을 입력하세요.');
         return;
       }
@@ -87,11 +108,14 @@ export default {
         id: this.contentId,
         user_id: this.$store.state.user.id,
         title: this.curTitle,
-        description: this.curDesc,
+        description: this.$refs.desc.innerHTML,
       }).then(() => {
         this.$router.push('/');
       })
-    }
+    },
+    styleHandler(style) {
+      document.execCommand(style)
+    },
   }
 }
 </script>
@@ -116,27 +140,29 @@ export default {
       padding: 0 10px;
       border: 1px solid rgb(134, 134, 134); 
       border-radius: 4px;
+      font-size: 15px;
     }
   }
   .description {
     padding: 0 10px;
     height: 45vh;
     
-    textarea {
+    .textarea {
       padding: 10px;
       width: 95%;
       height: 95%;
       border: 1px solid rgb(134, 134, 134);
       border-radius: 4px;
+      overflow: auto;
     }
-    textarea:focus {
+    .textarea:focus {
       border: 2px solid black;
     }
   }
 }
 .button-area {
   padding: 10px 10px;
-  margin-top: 10px;
+  margin-top: 20px;
   position: relative;
   button {
     height: 40px;

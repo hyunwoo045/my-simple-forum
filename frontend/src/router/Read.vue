@@ -15,7 +15,7 @@
       </div>
       <div class="content-area-bottom">
         <div class="description">
-          {{ contentDescription }}
+          <p v-html="contentDescription"></p>
         </div>
       </div>
     </div>
