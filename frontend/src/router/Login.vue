@@ -17,7 +17,8 @@
           </div> <input
             type="text"
             v-model="inputs.email"
-            @focus="resetStatus" />
+            @focus="resetStatus"
+            @keydown.enter="loginHandler" />
         </div>
         <div class="password">
           <div class="label">
@@ -25,7 +26,8 @@
           </div> <input
             type="password"
             v-model="inputs.password"
-            @focus="resetStatus" />
+            @focus="resetStatus"
+            @keydown.enter="loginHandler" />
         </div>
       </div>
       <div class="submit">
