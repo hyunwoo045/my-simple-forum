@@ -4,14 +4,29 @@
       <div class="mode-label">
         {{ mode === 'modify' ? "수정" : "생성" }}
       </div>
-
       <div class="title">
         <input
           type="text"
           v-model="curTitle"
           placeholder="제목을 입력하세요." />
       </div>
-      <div class="description">
+      <div class="input-type">
+        <input
+          type="radio"
+          name="input_type"
+          value="HTML"
+          v-model="curInputType"
+          checked /> HTML
+        <input
+          type="radio"
+          name="input_type"
+          value="Markdown"
+          v-model="curInputType" /> Markdown
+      </div>
+      
+      <div
+        class="description html"
+        v-if="curInputType === 'HTML'">
         <div class="btn-area">
           <button @click="styleHandler('bold')">
             <b>B</b>
@@ -39,6 +54,14 @@
           <p v-html="description"></p>
         </div>
       </div>
+
+      <div
+        class="description markdown"
+        v-else-if="curInputType === 'Markdown'">
+        <textarea
+          class="textarea markdown"
+          v-model="md_text"></textarea>
+      </div>
     </div>
     
     <div class="button-area">
@@ -58,6 +81,8 @@
 
 <script>
 import defaultAPI from '~/core/defaultAPI';
+import marked from 'marked'
+
 export default {
   name: 'Add',
   props: {
@@ -82,6 +107,24 @@ export default {
     return {
       curTitle: this.title,
       curDesc: this.description,
+      curInputType: 'HTML',
+      md_text: '',
+    }
+  },
+  computed: {
+    markdownToHTML() {
+       marked.setOptions({
+        renderer: new marked.Renderer(),
+        gfm: true,
+        headerIds: false,
+        tables: true,
+        breaks: true,
+        pedantic: false,
+        sanitize: true,
+        smartLists: true,
+        smartypants: false
+      });
+      return marked(this.md_text);
     }
   },
   methods: {
@@ -89,10 +132,14 @@ export default {
       this.$router.go(-1);
     },
     createHandler() {
+      const lastInputDescription = this.curInputType === "HTML" 
+      ? this.$refs.desc.innerHTML 
+      : this.markdownToHTML;
+
       if (this.curTitle === '') {
         alert('제목을 입력하세요.');
         return;
-      } else if (this.$refs.desc.innerHTML === '') {
+      } else if (lastInputDescription === '') {
         alert('내용을 입력하세요.');
         return;
       }
@@ -103,12 +150,11 @@ export default {
       } else {
         url = `${defaultAPI.end_point}/content/create`
       }
-
       this.$http.post(url, {
         id: this.contentId,
         user_id: this.$store.state.user.id,
         title: this.curTitle,
-        description: this.$refs.desc.innerHTML,
+        description: lastInputDescription,
       }).then(() => {
         this.$router.push('/');
       })
@@ -143,6 +189,9 @@ export default {
       font-size: 15px;
     }
   }
+  .input-type {
+    padding: 0 10px;
+  }
   .description {
     padding: 0 10px;
     height: 45vh;
@@ -157,6 +206,9 @@ export default {
     }
     .textarea:focus {
       border: 2px solid black;
+    }
+    .textarea.markdown {
+      margin-top: 25px;
     }
   }
 }

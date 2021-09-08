@@ -15,7 +15,9 @@
       </div>
       <div class="content-area-bottom">
         <div class="description">
-          <p v-html="cleanHTML"></p>
+          <p
+            class="input result"
+            v-html="cleanHTML"></p>
         </div>
       </div>
     </div>
@@ -86,21 +88,6 @@ import sanitizeHTML from 'sanitize-html';
 
 export default {
   created() {
-    /* 
-      로그인 세션 확인하기
-    */
-    this.$store.dispatch("user/AccessTokenHandler").then(res => {
-      if (res === "NOT_VALID_ACCESS_TOKEN") {
-        this.$store.dispatch("user/RefreshTokenHandler").then(res => {
-          if (res === "NOT_VALID_REFRESH_TOKEN") {
-            this.$store.commit("user/resetState");
-          }
-        })
-      } else if (res === "NEED_LOGIN") {
-        this.$store.commit("user/resetState");
-      }
-    });
-
     /*
       글 정보 가져온 후에 댓글 목록 가져오기
     */
@@ -245,9 +232,38 @@ export default {
   .description {
     p {
       word-break: break-all;
+      & > pre {
+        padding: 15px;
+        background-color: rgb(226, 226, 226);
+        border-radius: 24px;
+      }
+      & > table {
+        text-align: center;
+        & > thead {
+          background-color: rgb(187, 187, 187);
+        }
+        & > tbody {
+          background-color: rgb(241, 241, 241)
+        }
+        th, td {
+          padding: 5px 10px;
+        }
+      }
+      & > p > code {
+        color: #fff;
+        font-weight: 700;
+        background-color: rgb(145, 145, 145);
+        padding: 4px;
+        border-radius: 24px;
+      }
+      & > p > a {
+        color: blue;
+        text-decoration: underline;
+      }
     }
   }
 }
+
 
 .comment-area {
   &.label {
