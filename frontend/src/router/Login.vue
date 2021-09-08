@@ -44,11 +44,12 @@
           회원가입 하기
         </div>
       </RouterLink>
-      <div
-        class="btn"
-        @click="googleLoginHandler">
-        GOOGLE 로 로그인
-      </div>
+      <a href="http://localhost:3000/api/auth_social/google">     
+        <div
+          class="btn">
+          GOOGLE 로 로그인
+        </div>
+      </a>
       <div class="btn">
         FACEBOOK 으로 로그인
       </div>
@@ -116,11 +117,6 @@ export default {
       this.inputs.email = '';
       this.inputs.password = '';
     },
-    googleLoginHandler() {
-      this.$http.get(`${defaultAPI.end_point}/auth_social/google`).then(res => {
-        console.log(res)
-      })
-    }
   }
 }
 </script>

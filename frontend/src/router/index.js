@@ -5,6 +5,7 @@ import Read from "./Read";
 import Login from "./Login";
 import Signin from "./Signin";
 import Home from "./Home";
+import LoginSuccess from "./LoginSuccess";
 // import SessionCheck from "./SessionCheck";
 
 import store from "../store/index";
@@ -40,28 +41,37 @@ export default createRouter({
       },
     },
     {
+      path: "/loginsuccess",
+      component: LoginSuccess,
+      name: "LoginSuccess",
+    },
+    {
       path: "/",
       component: Home,
       name: "Home",
       beforeEnter: (to, from, next) => {
-        store.dispatch("user/AccessTokenHandler").then((res) => {
-          if (res === "NOT_VALID_ACCESS_TOKEN") {
-            store.dispatch("user/RefreshTokenHandler").then((res) => {
-              if (res === "NOT_VALID_REFRESH_TOKEN") {
-                store.commit("user/resetState");
-                next("/login");
-              } else {
-                next();
-              }
-            });
-          } else if (res === "NEED_LOGIN") {
-            store.commit("user/resetState");
-            next("/login");
-            return;
-          } else {
-            next();
-          }
-        });
+        if (store.state.user.isLoggedIn) {
+          next();
+        } else {
+          store.dispatch("user/AccessTokenHandler").then((res) => {
+            if (res === "NOT_VALID_ACCESS_TOKEN") {
+              store.dispatch("user/RefreshTokenHandler").then((res) => {
+                if (res === "NOT_VALID_REFRESH_TOKEN") {
+                  store.commit("user/resetState");
+                  next("/login");
+                } else {
+                  next();
+                }
+              });
+            } else if (res === "NEED_LOGIN") {
+              store.commit("user/resetState");
+              next("/login");
+              return;
+            } else {
+              next();
+            }
+          });
+        }
       },
       children: [
         {

@@ -27,24 +27,6 @@ const User = {
       );
     });
   },
-  // verify: (email, password) => {
-  //   return new Promise(function (resolve, reject) {
-  //     conn.query("SELECT * FROM user WHERE email=?", [email], (err, result) => {
-  //       if (err) reject(err);
-  //       else {
-  //         if (result[0].password === password)
-  //           resolve({
-  //             user_id: result[0].id,
-  //             email: result[0].email,
-  //             nickname: result[0].nickname,
-  //             age: result[0].age,
-  //             introduction: result[0].introduction,
-  //           });
-  //         else reject("NOT_VALID_PASSWORD");
-  //       }
-  //     });
-  //   });
-  // },
   findOneByUsername: (username) => {
     return new Promise((resolve, reject) => {
       conn.query(

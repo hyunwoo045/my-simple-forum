@@ -60,11 +60,18 @@ passport.use(
       callbackURL: "http://localhost:3000/api/auth_social/google/callback",
       passReqToCallback: true,
     },
-    (request, accessToken, refreshToken, profile, done) => {
-      console.log(profile);
-      console.log(accessToken);
+    async (request, accessToken, requestToken, profile, done) => {
+      // console.log("Profile: ", profile);
+      // console.log("Access Token: ", accessToken);
 
-      return done(null, profile);
+      const email = profile.email;
+
+      // console.log("Refresh Token: ", refreshToken);
+      return done(null, profile, {
+        message: "OK!",
+        accessToken,
+        profile,
+      });
     }
   )
 );
