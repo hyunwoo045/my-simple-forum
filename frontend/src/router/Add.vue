@@ -2,13 +2,14 @@
   <div class="container">
     <div class="input-area">
       <div class="mode-label">
-        {{ mode === 'modify' ? "수정" : "생성" }}
+        {{ mode === "modify" ? "수정" : "생성" }}
       </div>
       <div class="title">
         <input
           type="text"
           v-model="curTitle"
-          placeholder="제목을 입력하세요." />
+          placeholder="제목을 입력하세요."
+        />
       </div>
       <div class="input-type">
         <input
@@ -16,17 +17,19 @@
           name="input_type"
           value="HTML"
           v-model="curInputType"
-          checked /> HTML
+          checked
+        />
+        HTML
         <input
           type="radio"
           name="input_type"
           value="Markdown"
-          v-model="curInputType" /> Markdown
+          v-model="curInputType"
+        />
+        Markdown
       </div>
-      
-      <div
-        class="description html"
-        v-if="curInputType === 'HTML'">
+
+      <div class="description html" v-if="curInputType === 'HTML'">
         <div class="btn-area">
           <button @click="styleHandler('bold')">
             <b>B</b>
@@ -40,55 +43,36 @@
           <button @click="styleHandler('strikeThrough')">
             <s>S</s>
           </button>
-          <button @click="styleHandler('insertOrderedList')">
-            ol
-          </button>
-          <button @click="styleHandler('insertUnorderedList')">
-            ul
-          </button>
+          <button @click="styleHandler('insertOrderedList')">ol</button>
+          <button @click="styleHandler('insertUnorderedList')">ul</button>
         </div>
-        <div
-          class="textarea"
-          contenteditable="true"
-          ref="desc">
+        <div class="textarea" contenteditable="true" ref="desc">
           <p v-html="description"></p>
         </div>
       </div>
 
-      <div
-        class="description markdown"
-        v-else-if="curInputType === 'Markdown'">
-        <textarea
-          class="textarea markdown"
-          v-model="md_text"></textarea>
+      <div class="description markdown" v-else-if="curInputType === 'Markdown'">
+        <textarea class="textarea markdown" v-model="md_text"></textarea>
       </div>
     </div>
-    
+
     <div class="button-area">
-      <button
-        class="cancel"
-        @click="back">
-        취소
-      </button>
-      <button
-        class="submit"
-        @click="createHandler">
-        확인
-      </button>
+      <button class="cancel" @click="back">취소</button>
+      <button class="submit" @click="createHandler">확인</button>
     </div>
   </div>
 </template>
 
 <script>
-import defaultAPI from '~/core/defaultAPI';
-import marked from 'marked'
+import defaultAPI from "~/core/defaultAPI";
+import marked from "marked";
 
 export default {
-  name: 'Add',
+  name: "Add",
   props: {
     mode: {
       type: String,
-      default: '',
+      default: "",
     },
     contentId: {
       type: Number,
@@ -96,24 +80,24 @@ export default {
     },
     title: {
       type: String,
-      default: '',
+      default: "",
     },
     description: {
       type: String,
-      default: '',
-    }
+      default: "",
+    },
   },
   data() {
     return {
       curTitle: this.title,
       curDesc: this.description,
-      curInputType: 'HTML',
-      md_text: '',
-    }
+      curInputType: "HTML",
+      md_text: "",
+    };
   },
   computed: {
     markdownToHTML() {
-       marked.setOptions({
+      marked.setOptions({
         renderer: new marked.Renderer(),
         gfm: true,
         headerIds: false,
@@ -122,52 +106,55 @@ export default {
         pedantic: false,
         sanitize: true,
         smartLists: true,
-        smartypants: false
+        smartypants: false,
       });
       return marked(this.md_text);
-    }
+    },
   },
   methods: {
     back() {
       this.$router.go(-1);
     },
     createHandler() {
-      const lastInputDescription = this.curInputType === "HTML" 
-      ? this.$refs.desc.innerHTML 
-      : this.markdownToHTML;
+      const lastInputDescription =
+        this.curInputType === "HTML"
+          ? this.$refs.desc.innerHTML
+          : this.markdownToHTML;
 
-      if (this.curTitle === '') {
-        alert('제목을 입력하세요.');
+      if (this.curTitle === "") {
+        alert("제목을 입력하세요.");
         return;
-      } else if (lastInputDescription === '') {
-        alert('내용을 입력하세요.');
+      } else if (lastInputDescription === "") {
+        alert("내용을 입력하세요.");
         return;
       }
-      
-      let url = ''
-      if (this.mode === 'modify') {
-        url = `${defaultAPI.end_point}/content/modify`
+
+      let url = "";
+      if (this.mode === "modify") {
+        url = `${defaultAPI.end_point}/content/modify`;
       } else {
-        url = `${defaultAPI.end_point}/content/create`
+        url = `${defaultAPI.end_point}/content/create`;
       }
-      this.$http.post(url, {
-        id: this.contentId,
-        user_id: this.$store.state.user.id,
-        title: this.curTitle,
-        description: lastInputDescription,
-      }).then(() => {
-        this.$router.push('/');
-      })
+      this.$http
+        .post(url, {
+          id: this.contentId,
+          user_id: this.$store.state.user.id,
+          title: this.curTitle,
+          description: lastInputDescription,
+        })
+        .then(() => {
+          this.$router.push("/");
+        });
     },
     styleHandler(style) {
-      document.execCommand(style)
+      document.execCommand(style);
     },
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss" scoped>
-@import '~/scss/main';
+@import "~/scss/main";
 .input-area {
   .mode-label {
     height: 50px;
@@ -184,7 +171,7 @@ export default {
       height: 80%;
       width: 95%;
       padding: 0 10px;
-      border: 1px solid rgb(134, 134, 134); 
+      border: 1px solid rgb(134, 134, 134);
       border-radius: 4px;
       font-size: 15px;
     }
@@ -195,7 +182,7 @@ export default {
   .description {
     padding: 0 10px;
     height: 45vh;
-    
+
     .textarea {
       padding: 10px;
       width: 95%;

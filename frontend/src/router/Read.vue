@@ -5,9 +5,7 @@
         <div class="title">
           {{ contentTitle }}
         </div>
-        <div class="author">
-          작성자: {{ contentAuthor }}
-        </div>
+        <div class="author">작성자: {{ contentAuthor }}</div>
         <div class="links">
           <span @click="modifyHandler">수정</span>
           <span @click="deleteHandler">삭제</span>
@@ -15,36 +13,25 @@
       </div>
       <div class="content-area-bottom">
         <div class="description">
-          <p
-            class="input result"
-            v-html="cleanHTML"></p>
+          <p class="input result" v-html="cleanHTML"></p>
         </div>
       </div>
     </div>
 
     <div class="container">
       <div class="comment-area">
-        <div class="comment-area label">
-          댓글
-        </div>
-        <div
-          class="comment-area inputs"
-          v-if="$store.state.user.isLoggedIn">
+        <div class="comment-area label">댓글</div>
+        <div class="comment-area inputs" v-if="$store.state.user.isLoggedIn">
           <div class="comment-write">
             <textarea
               class="comment-write-inner"
               placeholder="댓글을 입력하세요."
-              v-model="commentDescription"></textarea>
+              v-model="commentDescription"
+            ></textarea>
           </div>
-          <button
-            class="comment-submit"
-            @click="addComment">
-            작성
-          </button>
+          <button class="comment-submit" @click="addComment">작성</button>
         </div>
-        <div
-          class="comment-area inputs"
-          v-else>
+        <div class="comment-area inputs" v-else>
           로그인 후 댓글을 작성해 주세요!
         </div>
 
@@ -54,7 +41,8 @@
             v-for="(comment, commentIdx) in comments"
             :key="commentIdx"
             @mouseenter="setCurrentCommentIndex(commentIdx)"
-            @mouseleave="setCurrentCommentIndex(-1)">
+            @mouseleave="setCurrentCommentIndex(-1)"
+          >
             <div class="comment top">
               <div class="comment-author">
                 {{ comment.author }}
@@ -63,7 +51,7 @@
                 {{ comment.created.split("T")[0] }}
               </div>
             </div>
-            
+
             <div class="comment bottom">
               <div class="description">
                 {{ comment.description }}
@@ -71,7 +59,8 @@
               <div
                 class="comment-delete"
                 @click="commentDelete(comment.user_id, comment.id)"
-                v-if="curCommentIdx === commentIdx">
+                v-if="curCommentIdx === commentIdx"
+              >
                 삭제
               </div>
             </div>
@@ -83,8 +72,8 @@
 </template>
 
 <script>
-import defaultAPI from '~/core/defaultAPI'
-import sanitizeHTML from 'sanitize-html';
+import defaultAPI from "~/core/defaultAPI";
+import sanitizeHTML from "sanitize-html";
 
 export default {
   created() {
@@ -92,111 +81,123 @@ export default {
       글 정보 가져온 후에 댓글 목록 가져오기
     */
     this.contentId = this.$route.query.id;
-    this.$http.get(`${defaultAPI.end_point}/content?id=${this.$route.query.id}`)
-    .then(response => {
-      this.contentTitle = response.data[0].title;
-      this.contentDescription = response.data[0].description;
-      this.contentAuthor = response.data[0].author;
-      if (response.data[0].user_id === this.$store.state.user.id) {
-        this.thisUserUpdatable = true;
-      }
-      this.$http.get(`${defaultAPI.end_point}/comment?id=${this.$route.query.id}`)
-      .then(response => {
-        this.comments = response.data;
+    this.$http
+      .get(`${defaultAPI.end_point}/content?id=${this.$route.query.id}`)
+      .then((response) => {
+        this.contentTitle = response.data[0].title;
+        this.contentDescription = response.data[0].description;
+        this.contentAuthor = response.data[0].author;
+        if (response.data[0].user_id === this.$store.state.user.id) {
+          this.thisUserUpdatable = true;
+        }
+        this.$http
+          .get(`${defaultAPI.end_point}/comment?id=${this.$route.query.id}`)
+          .then((response) => {
+            this.comments = response.data;
+          });
       });
-    });    
   },
   data() {
     return {
       contentId: -1,
-      contentTitle: '',
-      contentDescription: '',
-      contentAuthor: '',
+      contentTitle: "",
+      contentDescription: "",
+      contentAuthor: "",
       curCommentIdx: -1,
       comments: [],
-      commentDescription: '',
+      commentDescription: "",
       thisUserUpdatable: false,
-    }
+    };
   },
   computed: {
     cleanHTML() {
       return sanitizeHTML(this.contentDescription, {
-        allowedTags: sanitizeHTML.defaults.allowedTags.concat(['strike'])
+        allowedTags: sanitizeHTML.defaults.allowedTags.concat(["strike"]),
       });
-    }
+    },
   },
   methods: {
     modifyHandler() {
       if (this.contentAuthor !== this.$store.state.user.username) {
-        alert('수정 권한이 없습니다.');
-        return
+        alert("수정 권한이 없습니다.");
+        return;
       }
       this.$router.push({
-        name: 'Add',
+        name: "Add",
         params: {
-          mode: 'modify',
+          mode: "modify",
           contentId: this.contentId,
           title: this.contentTitle,
           description: this.contentDescription,
         },
-      })
+      });
     },
     deleteHandler() {
       if (!this.thisUserUpdatable) {
-        alert('삭제 권한이 없습니다.');
-        return
+        alert("삭제 권한이 없습니다.");
+        return;
       }
 
       if (confirm("정말 삭제하시겠습니까?") === true) {
-        this.$http.post(`${defaultAPI.end_point}/content/delete`, { id: this.contentId }).then(() => {
-          this.$router.push('/')
-        })
+        this.$http
+          .post(`${defaultAPI.end_point}/content/delete`, {
+            id: this.contentId,
+          })
+          .then(() => {
+            this.$router.push("/");
+          });
       } else {
-        return
+        return;
       }
     },
 
     addComment() {
-      this.$http.post(`${defaultAPI.end_point}/comment/create`, {
-        user_id: this.$store.state.user.id,
-        description: this.commentDescription,
-        content_id: this.contentId
-      }).then(() => {
-        this.$http.get(`${defaultAPI.end_point}/comment?id=${this.contentId}`)
-        .then(response => {
-          this.comments = response.data;
+      this.$http
+        .post(`${defaultAPI.end_point}/comment/create`, {
+          user_id: this.$store.state.user.id,
+          description: this.commentDescription,
+          content_id: this.contentId,
+        })
+        .then(() => {
+          this.$http
+            .get(`${defaultAPI.end_point}/comment?id=${this.contentId}`)
+            .then((response) => {
+              this.comments = response.data;
+            });
+          this.commentDescription = "";
         });
-        this.commentDescription = '';
-      });
     },
     commentDelete(user_id, id) {
       if (this.$store.state.user.id !== user_id) {
-        alert('삭제 권한이 없습니다.');
-        return
+        alert("삭제 권한이 없습니다.");
+        return;
       }
 
       if (confirm("댓글을 정말 삭제하시겠습니까?") === true) {
-        this.$http.post(`${defaultAPI.end_point}/comment/delete`, {
-          id
-        }).then(() => {
-          this.$http.get(`${defaultAPI.end_point}/comment?id=${this.contentId}`)
-          .then((response) => {
-            this.comments = response.data;
+        this.$http
+          .post(`${defaultAPI.end_point}/comment/delete`, {
+            id,
           })
-        });
+          .then(() => {
+            this.$http
+              .get(`${defaultAPI.end_point}/comment?id=${this.contentId}`)
+              .then((response) => {
+                this.comments = response.data;
+              });
+          });
       } else {
-        return
+        return;
       }
     },
     setCurrentCommentIndex(idx) {
       this.curCommentIdx = idx;
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style lang="scss">
-@import '~/scss/main';
+@import "~/scss/main";
 .container {
   margin-bottom: 30px;
 }
@@ -243,9 +244,10 @@ export default {
           background-color: rgb(187, 187, 187);
         }
         & > tbody {
-          background-color: rgb(241, 241, 241)
+          background-color: rgb(241, 241, 241);
         }
-        th, td {
+        th,
+        td {
           padding: 5px 10px;
         }
       }
@@ -263,7 +265,6 @@ export default {
     }
   }
 }
-
 
 .comment-area {
   &.label {
@@ -293,7 +294,7 @@ export default {
         width: 95%;
         height: 85%;
         font-size: 14px;
-        font-family: Helvetica,Arial, Malgun Gothic, sans-serif;
+        font-family: Helvetica, Arial, Malgun Gothic, sans-serif;
       }
     }
     button {
@@ -313,7 +314,7 @@ export default {
       border: none;
     }
     padding: 20px;
-    
+
     .comment {
       margin-bottom: 5px;
       &.top {

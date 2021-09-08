@@ -11,14 +11,14 @@
 </template>
 
 <script>
-import Header from '~/components/Header';
-import Userbox from '~/components/Userbox';
+import Header from "~/components/Header";
+import Userbox from "~/components/Userbox";
 export default {
   components: {
     Userbox,
     Header,
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss" scoped>

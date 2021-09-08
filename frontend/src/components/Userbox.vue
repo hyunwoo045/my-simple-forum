@@ -1,27 +1,18 @@
 <template>
   <div class="userbox">
     <div class="user-info">
-      <div
-        class="username">
+      <div class="username">
         {{ username }}
       </div>
     </div>
     <div class="button-area">
-      <div
-        class="btn"
-        @click="searchAllContents">
-        전체 글
-      </div>
-      <div
-        class="btn"
-        @click="searchMyContents">
-        내가 쓴 글
-      </div>
-      <RouterLink
+      <div class="btn" @click="searchAllContents">전체 글</div>
+      <div class="btn" @click="searchMyContents">내가 쓴 글</div>
+      <router-link
         class="btn green"
         :to="{ name: 'Add', params: { mode: 'add' } }">
         글쓰기
-      </RouterLink>
+      </router-link>
     </div>
   </div>
 </template>
@@ -31,7 +22,7 @@ export default {
   computed: {
     username() {
       return this.$store.state.user.username;
-    }
+    },
   },
   methods: {
     searchMyContents() {
@@ -39,14 +30,14 @@ export default {
         name: "Container",
         query: {
           user_id: this.$store.state.user.id,
-        }
+        },
       });
     },
     searchAllContents() {
-      this.$router.push('/')
-    }
-  }
-}
+      this.$router.push("/");
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -88,5 +79,11 @@ export default {
       }
     }
   }
+}
+
+test {
+test-for {
+  background-color: black;
+}
 }
 </style>

@@ -3,13 +3,13 @@
 </template>
 
 <script>
-export default ({
+export default {
   data() {
     return {
-      message: 'Hello Vue!'
-    }
-  }
-})
+      message: "Hello Vue!",
+    };
+  },
+};
 </script>
 
 <style lang="scss" scoped>
