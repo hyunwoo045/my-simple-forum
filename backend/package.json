@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "pm2 start ./bin/www",
+    "start": "pm2 start ./bin/www --watch",
     "stop": "pm2 stop ./bin/www"
   },
   "dependencies": {
@@ -15,6 +15,8 @@
     "jsonwebtoken": "^8.5.1",
     "morgan": "~1.9.1",
     "mysql": "^2.18.1",
+    "passport": "^0.4.1",
+    "passport-google-oauth2": "^0.2.0",
     "pug": "2.0.0-beta11"
   }
 }

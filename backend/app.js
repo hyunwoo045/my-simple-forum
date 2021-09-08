@@ -13,10 +13,18 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+const passport = require("passport");
+
+const GoogleStrategy = require("passport-google-oauth2").Strategy;
+
+const GOOGLE_CLIENT_ID =
+  "647766314048-9odi2ct7sk8u9ab0a3vbsfrr0qmget9s.apps.googleusercontent.com";
+const GOOGLE_CLIENT_SECRET = "jDDiurwy2D6b-1afqPW5hcvR";
 
 var commentRouter = require("./routes/comment");
 var contentRouter = require("./routes/content");
 var authRouter = require("./routes/auth");
+var authSocialRouter = require("./routes/auth_social");
 
 var app = express();
 
@@ -30,10 +38,36 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cors);
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use("/api/comment", commentRouter);
 app.use("/api/content", contentRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/auth_social", authSocialRouter);
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+passport.deserializeUser((id, done) => {
+  done(null, id);
+});
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      callbackURL: "http://localhost:3000/api/auth_social/google/callback",
+      passReqToCallback: true,
+    },
+    (request, accessToken, refreshToken, profile, done) => {
+      console.log(profile);
+      console.log(accessToken);
+
+      return done(null, profile);
+    }
+  )
+);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
