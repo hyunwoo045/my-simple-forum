@@ -116,6 +116,7 @@ export default {
       this.$router.go(-1);
     },
     createHandler() {
+      console.log(this.$store.state.user.id);
       const lastInputDescription =
         this.curInputType === "HTML"
           ? this.$refs.desc.innerHTML
@@ -135,6 +136,7 @@ export default {
       } else {
         url = `${defaultAPI.end_point}/content/create`;
       }
+      console.log(this.$store.state.user.id);
       this.$http
         .post(url, {
           id: this.contentId,

@@ -21,7 +21,7 @@
           type="text"
           placeholder="닉네임"
           v-model="nicknameInput"
-          @focus="nicknameErr = false"
+          @focus="nicknameInput = ''"
         />
         <div class="errmsg" v-if="errMessage !== ''">{{ errMessage }}</div>
       </div>
@@ -91,22 +91,14 @@ export default {
           nickname: this.nicknameInput,
         })
         .then((res) => {
-          // if (res.data === "DUP_EMAIL") {
-          //   this.emailErr = true;
-          // } else if (res.data === "DUP_NICKNAME") {
-          //   this.nicknameErr = true;
-          // } else if (res.data === "OK") {
-          //   alert("회원가입에 성공하였습니다.");
-          //   this.$router.push("/login");
-          // } else {
-          //   throw res.data;
-          // }
           console.log(res.data);
           if (res.data === "DUP_NICKNAME") {
             this.errMessage = "중복된 닉네임입니다.";
           } else {
             const payload = res.data;
             this.$store.commit("user/setState", payload);
+            localStorage.setItem("accessToken", payload.accessToken);
+            localStorage.setItem("refreshToken", payload.refreshToken);
             alert("회원가입에 성공하였습니다.");
             this.$router.push("/");
           }

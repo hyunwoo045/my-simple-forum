@@ -57,6 +57,7 @@ export default createRouter({
               store.dispatch("user/RefreshTokenHandler").then((res) => {
                 if (res === "NOT_VALID_REFRESH_TOKEN") {
                   store.commit("user/resetState");
+                  alert("세션이 만료되었습니다.");
                   next("/login");
                 } else {
                   next();

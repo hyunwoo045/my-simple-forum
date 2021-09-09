@@ -4,20 +4,28 @@
 
 <script>
 import defaultAPI from "~/core/defaultAPI";
+import VueCookies from "vue-cookies";
 
 export default {
   created() {
-    const { id, nickname } = this.$route.query;
-    this.$http
-      .post(`${defaultAPI.end_point}/auth/login`, { id, nickname })
-      .then((res) => {
-        console.log(res);
-        localStorage.setItem("accessToken", res.data.accessToken);
-        localStorage.setItem("refreshToken", res.data.refreshToken);
+    if (!VueCookies.isKey("id") && !VueCookies.isKey("nickname")) {
+      alert("잘못된 접근입니다.");
+      this.$router.push("/login");
+    } else {
+      const id = VueCookies.get("id");
+      const nickname = VueCookies.get("nickname");
 
-        this.$store.commit("user/setState", { user_id: id, nickname });
-        this.$router.push("/");
-      });
+      this.$http
+        .post(`${defaultAPI.end_point}/auth/login`, { id, nickname })
+        .then((res) => {
+          console.log(res);
+          localStorage.setItem("accessToken", res.data.accessToken);
+          localStorage.setItem("refreshToken", res.data.refreshToken);
+          this.$store.commit("user/setState", { id, nickname });
+          VueCookies.keys().forEach((cookie) => VueCookies.remove(cookie));
+          this.$router.push("/");
+        });
+    }
   },
 };
 </script>

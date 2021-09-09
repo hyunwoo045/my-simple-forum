@@ -36,7 +36,9 @@ router.post("/register", async (req, res) => {
     await User.findOneByUsername(nickname);
     await User.create(email, nickname);
     const payload = await User.getUserInfo(email)
-    res.send(payload);
+    const accessToken = await JWTController.accessGenerate(payload);
+    const refreshToken = await JWTController.refreshGenerate(payload);
+    res.send({ ...payload, accessToken, refreshToken });
   } catch (error) {
     res.send(error);
   }
@@ -48,20 +50,14 @@ router.get("/check", async (req, res) => {
   const token = queryData.token;
   try {
     const decoded = await JWTController.accessVerify(token);
-    const { user_id, email, nickname, age, introduction } = decoded;
+    const { id, nickname } = decoded;
     const newAccessToken = await JWTController.accessGenerate({
-      user_id,
-      email,
+      id,
       nickname,
-      age,
-      introduction,
     });
     const newRefreshToken = await JWTController.refreshGenerate({
-      user_id,
-      email,
+      id,
       nickname,
-      age,
-      introduction,
     });
     res.send({
       message: "VALID_TOKEN",
@@ -81,20 +77,14 @@ router.get("/check_refresh", async (req, res) => {
   const queryData = url.parse(_url, true).query;
   const token = queryData.token;
   try {
-    const { user_id, email, nickname, age, introduction } = decoded;
+    const { id, nickname } = decoded;
     const newAccessToken = await JWTController.accessGenerate({
-      user_id,
-      email,
+      id,
       nickname,
-      age,
-      introduction,
     });
     const newRefreshToken = await JWTController.refreshGenerate({
-      user_id,
-      email,
+      id,
       nickname,
-      age,
-      introduction,
     });
     res.send({
       message: "VALID_REFRESH_TOKEN",

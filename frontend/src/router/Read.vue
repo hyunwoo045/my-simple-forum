@@ -21,7 +21,8 @@
     <div class="container">
       <div class="comment-area">
         <div class="comment-area label">댓글</div>
-        <div class="comment-area inputs" v-if="$store.state.user.isLoggedIn">
+        <!-- <div class="comment-area inputs" v-if="$store.state.user.isLoggedIn"> -->
+        <div class="comment-area inputs">
           <div class="comment-write">
             <textarea
               class="comment-write-inner"
@@ -31,9 +32,9 @@
           </div>
           <button class="comment-submit" @click="addComment">작성</button>
         </div>
-        <div class="comment-area inputs" v-else>
+        <!-- <div class="comment-area inputs" v-else>
           로그인 후 댓글을 작성해 주세요!
-        </div>
+        </div> -->
 
         <div class="comment-area comments">
           <div
@@ -118,7 +119,7 @@ export default {
   },
   methods: {
     modifyHandler() {
-      if (this.contentAuthor !== this.$store.state.user.username) {
+      if (this.contentAuthor !== this.$store.state.user.nickname) {
         alert("수정 권한이 없습니다.");
         return;
       }
@@ -133,7 +134,7 @@ export default {
       });
     },
     deleteHandler() {
-      if (!this.thisUserUpdatable) {
+      if (this.contentAuthor !== this.$store.state.user.nickname) {
         alert("삭제 권한이 없습니다.");
         return;
       }

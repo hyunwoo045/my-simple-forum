@@ -29,8 +29,8 @@ export default {
   actions: {
     async AccessTokenHandler({ commit }) {
       try {
-        const { nickname, user_id } = await verifyAccessToken();
-        commit("setState", { nickname, user_id });
+        const { nickname, id } = await verifyAccessToken();
+        commit("setState", { nickname, id });
         return "OK";
       } catch (err) {
         return err;
@@ -38,8 +38,8 @@ export default {
     },
     async RefreshTokenHandler({ commit }) {
       try {
-        const { nickname, user_id } = await verifyRefreshToken();
-        commit("setState", { nickname, user_id });
+        const { nickname, id } = await verifyRefreshToken();
+        commit("setState", { nickname, id });
         return "OK";
       } catch (err) {
         return err;
@@ -63,7 +63,7 @@ function verifyAccessToken() {
             localStorage.setItem("refreshToken", data.refreshToken);
             resolve({
               nickname: data.decoded.nickname,
-              user_id: data.decoded.user_id,
+              id: data.decoded.id,
             });
           } else {
             reject("NOT_VALID_ACCESS_TOKEN");
@@ -88,7 +88,7 @@ function verifyRefreshToken() {
             localStorage.setItem("refreshToken", data.refreshToken);
             resolve({
               nickname: data.decoded.nickname,
-              user_id: data.decoded.user_id,
+              id: data.decoded.id,
             });
           } else {
             reject("NOT_VALID_REFRESH_TOKEN");

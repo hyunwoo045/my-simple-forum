@@ -16,8 +16,11 @@ router.get("/google/callback", (req, res) => {
     try {
       const payload = await User.getUserInfo(email);
       const { id, nickname } = payload;
+      res.cookie("id", id);
+      res.cookie("nickname", nickname)
       res.redirect(
-        `${endpoint}loginsuccess?id=${id}&nickname=${nickname}`
+        // `${endpoint}loginsuccess?id=${id}&nickname=${nickname}`
+        `${endpoint}loginsuccess`
       );
     } catch (err) {
       res.redirect(`${endpoint}signin?email=${info.profile.email}`);
