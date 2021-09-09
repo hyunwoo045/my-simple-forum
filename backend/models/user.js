@@ -5,19 +5,20 @@ const dbconfig = require("../key/dbkey");
 const conn = mysql.createConnection(dbconfig);
 
 const User = {
-  createHashPassword: (nickname, password) => {
-    return new Promise((resolve, reject) => {
-      crypto.pbkdf2(password, nickname, 110317, 64, "sha512", (err, key) => {
-        if (err) reject(err);
-        resolve(key.toString("base64"));
-      });
-    });
-  },
-  create: (email, username, password) => {
+  // createHashPassword: (nickname, password) => {
+  //   return new Promise((resolve, reject) => {
+  //     crypto.pbkdf2(password, nickname, 110317, 64, "sha512", (err, key) => {
+  //       if (err) reject(err);
+  //       resolve(key.toString("base64"));
+  //     });
+  //   });
+  // },
+
+  create: (email, nickname) => {
     return new Promise((resolve, reject) => {
       conn.query(
-        "INSERT INTO user (email, nickname, password) VALUES (?, ?, ?);",
-        [email, username, password],
+        "INSERT INTO user (email, nickname) VALUES (?, ?);",
+        [email, nickname],
         (err) => {
           if (err) reject(err);
           else {
@@ -27,6 +28,7 @@ const User = {
       );
     });
   },
+
   findOneByUsername: (username) => {
     return new Promise((resolve, reject) => {
       conn.query(
@@ -42,21 +44,23 @@ const User = {
       );
     });
   },
-  findOneByEmail: (email) => {
-    return new Promise((resolve, reject) => {
-      conn.query(
-        "SELECT COUNT(*) AS length FROM user WHERE email=?",
-        [email],
-        (err, result) => {
-          if (err) reject(err);
-          else {
-            if (result[0].length !== 0) reject("DUP_EMAIL");
-            else resolve();
-          }
-        }
-      );
-    });
-  },
+
+  // findOneByEmail: (email) => {
+  //   return new Promise((resolve, reject) => {
+  //     conn.query(
+  //       "SELECT COUNT(*) AS length FROM user WHERE email=?",
+  //       [email],
+  //       (err, result) => {
+  //         if (err) reject(err);
+  //         else {
+  //           if (result[0].length !== 0) reject("DUP_EMAIL");
+  //           else resolve();
+  //         }
+  //       }
+  //     );
+  //   });
+  // },
+
   getUserInfo: (email) => {
     return new Promise((resolve, reject) => {
       conn.query("SELECT * FROM user WHERE email=?", [email], (err, result) => {
@@ -64,12 +68,9 @@ const User = {
         else if (result.length === 0) reject("NOT_FOUND_EMAIL");
         else {
           resolve({
-            user_id: result[0].id,
-            email: result[0].email,
+            id: result[0].id,
             nickname: result[0].nickname,
-            dbPassword: result[0].password,
-            age: result[0].age,
-            introduction: result[0].introduction,
+            // dbPassword: result[0].password,
           });
         }
       });

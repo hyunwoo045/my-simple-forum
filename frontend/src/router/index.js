@@ -6,7 +6,6 @@ import Login from "./Login";
 import Signin from "./Signin";
 import Home from "./Home";
 import LoginSuccess from "./LoginSuccess";
-// import SessionCheck from "./SessionCheck";
 
 import store from "../store/index";
 

@@ -63,13 +63,12 @@ passport.use(
     async (request, accessToken, requestToken, profile, done) => {
       // console.log("Profile: ", profile);
       // console.log("Access Token: ", accessToken);
-
+      console.log({ accessToken, requestToken, profile });
       const email = profile.email;
 
       // console.log("Refresh Token: ", refreshToken);
       return done(null, profile, {
         message: "OK!",
-        accessToken,
         profile,
       });
     }

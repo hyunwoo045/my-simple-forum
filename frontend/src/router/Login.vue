@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="headline">로그인해서 글을 작성하고 댓글도 달아보세요!</div>
-    <div class="login">
+    <!-- <div class="login">
       <div class="form">
         <div class="errmsg">
           {{
@@ -36,11 +36,11 @@
       <div class="submit">
         <div class="btn" @click="loginHandler">로그인</div>
       </div>
-    </div>
+    </div> -->
     <div class="signin">
-      <RouterLink to="/signin">
+      <!-- <RouterLink to="/signin">
         <div class="btn red">회원가입 하기</div>
-      </RouterLink>
+      </RouterLink> -->
       <a href="http://localhost:3000/api/auth_social/google">
         <div class="btn">GOOGLE 로 로그인</div>
       </a>

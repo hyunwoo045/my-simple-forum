@@ -12,15 +12,17 @@ router.get(
 router.get("/google/callback", (req, res) => {
   passport.authenticate("google", async (err, user, info) => {
     if (err) throw err;
-    console.log(info);
+    const email = info.profile.email;
     try {
-      const payload = await User.getUserInfo(info.profile.email);
+      const payload = await User.getUserInfo(email);
+      const { id, nickname } = payload;
       res.redirect(
-        `${endpoint}loginsuccess?id=1&nickname=user01&token=${info.accessToken}`
+        `${endpoint}loginsuccess?id=${id}&nickname=${nickname}`
       );
     } catch (err) {
       res.redirect(`${endpoint}signin?email=${info.profile.email}`);
     }
   })(req, res);
 });
+
 module.exports = router;

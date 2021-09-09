@@ -8,19 +8,19 @@ export default {
     return {
       isLoggedIn: false,
       id: -1,
-      username: "",
+      nickname: "",
     };
   },
   mutations: {
     setState(state, payload) {
-      const { user_id, nickname } = payload;
+      const { id, nickname } = payload;
       state.isLoggedIn = true;
-      state.username = nickname;
-      state.id = user_id;
+      state.id = id;
+      state.nickname = nickname;
     },
     resetState(state) {
       state.id = -1;
-      state.username = "";
+      state.nickname = "";
       state.isLoggedIn = false;
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
@@ -36,7 +36,6 @@ export default {
         return err;
       }
     },
-
     async RefreshTokenHandler({ commit }) {
       try {
         const { nickname, user_id } = await verifyRefreshToken();

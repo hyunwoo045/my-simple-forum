@@ -3,17 +3,21 @@
 </template>
 
 <script>
+import defaultAPI from "~/core/defaultAPI";
+
 export default {
   created() {
-    const { id, nickname, token } = this.$route.query;
-    localStorage.setItem("googleToken", token);
+    const { id, nickname } = this.$route.query;
+    this.$http
+      .post(`${defaultAPI.end_point}/auth/login`, { id, nickname })
+      .then((res) => {
+        console.log(res);
+        localStorage.setItem("accessToken", res.data.accessToken);
+        localStorage.setItem("refreshToken", res.data.refreshToken);
 
-    this.$store.commit("user/setState", { user_id: id, nickname });
-
-    console.log({ id, nickname, token });
-    console.log(this.$store.state.user.username);
-    console.log(this.$store.state.user.isLoggedIn);
-    this.$router.push("/");
+        this.$store.commit("user/setState", { user_id: id, nickname });
+        this.$router.push("/");
+      });
   },
 };
 </script>

@@ -10,7 +10,8 @@
       <div class="btn" @click="searchMyContents">내가 쓴 글</div>
       <router-link
         class="btn green"
-        :to="{ name: 'Add', params: { mode: 'add' } }">
+        :to="{ name: 'Add', params: { mode: 'add' } }"
+      >
         글쓰기
       </router-link>
     </div>
@@ -21,7 +22,7 @@
 export default {
   computed: {
     username() {
-      return this.$store.state.user.username;
+      return this.$store.state.user.nickname;
     },
   },
   methods: {
@@ -82,8 +83,8 @@ export default {
 }
 
 test {
-test-for {
-  background-color: black;
-}
+  test-for {
+    background-color: black;
+  }
 }
 </style>

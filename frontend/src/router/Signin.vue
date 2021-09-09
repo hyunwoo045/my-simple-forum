@@ -1,8 +1,9 @@
 <template>
   <div class="container">
     <div class="headline">기본정보입력</div>
+    <div class="section">게시판에서 사용할 닉네임을 설정해 주세요.</div>
     <div class="form">
-      <div class="input">
+      <!-- <div class="input">
         <input
           class="e-mail"
           :class="emailErr ? 'errored' : ''"
@@ -12,25 +13,25 @@
           @focus="emailErr = false"
         />
         <div class="errmsg" v-if="emailErr">중복된 이메일입니다.</div>
-      </div>
+      </div> -->
       <div class="input">
         <input
           class="nickname"
           :class="nicknameErr ? 'errored' : ''"
           type="text"
           placeholder="닉네임"
-          v-model="inputs.nickname"
+          v-model="nicknameInput"
           @focus="nicknameErr = false"
         />
-        <div class="errmsg" v-if="nicknameErr">중복된 닉네임입니다.</div>
+        <div class="errmsg" v-if="errMessage !== ''">{{ errMessage }}</div>
       </div>
-      <div class="input">
+      <!-- <div class="input">
         <input
           type="password"
           placeholder="비밀번호"
           v-model="inputs.password"
         />
-      </div>
+      </div> -->
     </div>
     <div class="btn-area">
       <RouterLink to="/login">
@@ -38,57 +39,76 @@
       </RouterLink>
       <div class="btn" @click="submitHandler">확인</div>
     </div>
-    <div class="login">
+    <!-- <div class="login">
       이미 회원이신가요?
       <RouterLink to="/login">
         <span class="link">로그인하기</span>
       </RouterLink>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
 import defaultAPI from "~/core/defaultAPI";
 export default {
+  created() {
+    this.email = this.$route.query.email;
+  },
   data() {
     return {
-      inputs: {
-        email: "",
-        nickname: "",
-        password: "",
-      },
+      email: "",
+      nicknameInput: "",
       submitAvailable: false,
-      emailErr: false,
-      nicknameErr: false,
-      passwordErr: false,
+      // emailErr: false,
+      errMessage: "",
+      // passwordErr: false,
     };
+  },
+  watch: {
+    errMessage() {},
   },
   methods: {
     submitHandler() {
-      if (this.inputs.email === "") {
-        alert("이메일을 입력하세요");
-        return;
-      } else if (this.inputs.nickname === "") {
-        alert("닉네임을 입력하세요");
-        return;
-      } else if (this.inputs.password === "") {
-        alert("비밀번호를 입력하세요");
+      // if (this.inputs.email === "") {
+      //   alert("이메일을 입력하세요");
+      //   return;
+      // } else if (this.inputs.nickname === "") {
+      //   alert("닉네임을 입력하세요");
+      //   return;
+      // } else if (this.inputs.password === "") {
+      //   alert("비밀번호를 입력하세요");
+      //   return;
+      // }
+
+      if (this.nicknameInput === "") {
+        this.errMessage = "닉네임은 필수 입력란입니다.";
         return;
       }
 
       this.$http
-        .post(`${defaultAPI.end_point}/auth/register`, { inputs: this.inputs })
+        .post(`${defaultAPI.end_point}/auth/register`, {
+          email: this.email,
+          nickname: this.nicknameInput,
+        })
         .then((res) => {
+          // if (res.data === "DUP_EMAIL") {
+          //   this.emailErr = true;
+          // } else if (res.data === "DUP_NICKNAME") {
+          //   this.nicknameErr = true;
+          // } else if (res.data === "OK") {
+          //   alert("회원가입에 성공하였습니다.");
+          //   this.$router.push("/login");
+          // } else {
+          //   throw res.data;
+          // }
           console.log(res.data);
-          if (res.data === "DUP_EMAIL") {
-            this.emailErr = true;
-          } else if (res.data === "DUP_NICKNAME") {
-            this.nicknameErr = true;
-          } else if (res.data === "OK") {
-            alert("회원가입에 성공하였습니다.");
-            this.$router.push("/login");
+          if (res.data === "DUP_NICKNAME") {
+            this.errMessage = "중복된 닉네임입니다.";
           } else {
-            throw res.data;
+            const payload = res.data;
+            this.$store.commit("user/setState", payload);
+            alert("회원가입에 성공하였습니다.");
+            this.$router.push("/");
           }
         });
     },
@@ -107,6 +127,12 @@ export default {
   padding: 0 30px;
   font-size: 24px;
   font-weight: 700;
+}
+.section {
+  padding: 0 30px;
+  height: 120px;
+  display: flex;
+  align-items: center;
 }
 .form {
   height: 200px;
