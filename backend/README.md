@@ -59,7 +59,7 @@ passport.use(
 
 구글을 기준으로 사용법을 기록하겠습니다. 흐름 따라서 기록합니다.
 
-1. Client에서 소셜 로그인 요청을 합니다. (`localhost:3000/auth/google`과 같은 페이지로 이동)
+1. Client에서 소셜 로그인 요청을 합니다.
 
 ```html
 <!-- Vue.js -->
@@ -127,7 +127,7 @@ router.get('/', async(req, res) => {
     await User.find(provider, id);
     const payload = {provider, id};
     const accessToken = await JWT.accessGenerate(payload);
-    res.cooke('accessToken', accessToken);
+    res.cookie('accessToken', accessToken);
     res.redirect(`${endpoint}/loginsuccess`); // 클라이언트로 다시 직접 이동
   }
 })
@@ -135,7 +135,7 @@ router.get('/', async(req, res) => {
 
 이런 방식의 동작이 실제 배포한 제품에서도 정상적으로 동작할지 의문입니다. 하지만 배포한 앱에서 구글/카카오 소셜 로그인 기능을 사용하기 위해선 `.com`, `.org` 와 같은 도메인이 필요해서 테스트 해보지도 못했죠. 기본적인 서버에 대한 지식이 부족하다보니 의문이 많이 생깁니다. 기능 구현을 마치고 문서를 작성하는 이 시점에도 해결하지 못한 문제..
 
-2. 파라미터변조 공격에 대한 치명적인 취약점이 드러났었습니다. 1번 문제로 서버-클라이언트의 연결이 없는 상태이기 때문에 `response`의 `send()` 메서드로 데이터를 담아 보내는 방법은 쓸 수 없었고, 가장 기본적으로 원격 데이터를 전달하는 방식인 URL 파라미터를 사용하게 되었었습니다.
+2. 파라미터변조 공격에 대한 치명적인 취약점이 드러났었습니다. 1번 문제로 서버-클라이언트의 연결이 없는 상태이기 때문에 `response`의 `send()` 메서드로 데이터를 담아 보내는 방법은 쓸 수 없었고, 가장 기본적인 원격 데이터 전달 방식인 URL 파라미터를 사용하게 되었었습니다.
 
 ```javascript
 router.get("/", async (req, res) => {
@@ -258,4 +258,4 @@ router.get("/google/callback", (req, res) => {
 
 쿠키로 받은 토큰을 검증하는 작업까지 추가하였기 때문에 DB를 해킹해서 provider, id, nickname 을 모두 알아내고, JWT 인코딩 방식까지 알아내어 토큰을 직접 만들고 쿠키에 저장한 후 loginsuccess 페이지에 url을 쳐서 들어오는 <s>미친</s> 해괴망측한 일을 벌이지 않는 이상 URL 로 직접 로그인을 할 수 있는 방법은 없을 것이라 생각됩니다.
 
-이 두 가지의 내용을 공유하며 마무리 하겠습니다. 더 좋은 설계 방식이 당연히 있을 것이구요. Passport의 session 기능을 이해하지 못하고 돌아가는 선택을 했기 때문에 어렵게 설계한 것일 수도 있습니다. 더 좋은 방법이 있다면 알려주세요 :D
+이 두 가지의 내용을 공유하며 마무리 하겠습니다. 더 좋은 설계 방식이 당연히 있겠죠. Passport의 session 기능을 이해하지 못하고 돌아가는 선택을 했기 때문에 어렵게 설계한 것일 수도 있습니다. 더 좋은 방법이 있다면 알려주세요 :D
