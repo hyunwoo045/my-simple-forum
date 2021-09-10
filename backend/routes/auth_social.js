@@ -38,7 +38,7 @@ router.get(
   }),
   async (req, res) => {
     res.redirect(
-      `/api/auth?provider=google&id=${req.user.id}&displayName=${req.user.displayName}`
+      `/api/auth?provider=google&identifier=${req.user.id}&displayName=${req.user.displayName}`
     );
   }
 );
@@ -50,7 +50,7 @@ router.get(
   }),
   async (req, res) => {
     res.redirect(
-      `/api/auth?provider=kakao&id=${req.user.id}&displayName=${req.user.displayName}`
+      `/api/auth?provider=kakao&identifier=${req.user.id}&displayName=${req.user.displayName}`
     );
   }
 );

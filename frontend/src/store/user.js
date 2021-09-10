@@ -7,18 +7,20 @@ export default {
   state: () => {
     return {
       isLoggedIn: false,
-      provider: "forum",
       id: -1,
+      provider: "forum",
       nickname: "",
+      identifier: "",
     };
   },
   mutations: {
     setState(state, payload) {
-      const { provider, id, displayName } = payload;
+      const { id, provider, identifier, displayName } = payload;
       state.isLoggedIn = true;
       state.provider = provider;
       state.id = id;
       state.nickname = displayName;
+      state.identifier = identifier;
     },
     resetState(state) {
       state.id = -1;

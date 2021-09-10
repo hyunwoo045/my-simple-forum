@@ -9,12 +9,11 @@ const endpoint = require("../key/endpoint").endpoint;
 router.get("/", async (req, res) => {
   const _url = req.url;
   const queryData = url.parse(_url, true).query;
-  const { provider, id, displayName } = queryData;
-  const payload = { provider, id, displayName };
+  const { provider, identifier, displayName } = queryData;
   try {
-    if (!(await User.find(provider, id))) {
-      User.create(provider, id, displayName);
-    }
+    const id = await User.find(provider, identifier);
+    if (!id) User.create(provider, identifier, displayName);
+    const payload = { id, provider, identifier, displayName };
     const accessToken = await JWTController.accessGenerate(payload);
     const refreshToken = await JWTController.accessGenerate(payload);
     res.cookie("accessToken", accessToken);
@@ -31,8 +30,8 @@ router.get("/check", async (req, res) => {
   const token = queryData.token;
   try {
     const decoded = await JWTController.accessVerify(token);
-    const { provider, id, displayName } = decoded;
-    const payload = { provider, id, displayName };
+    const { id, provider, identifier, displayName } = decoded;
+    const payload = { id, provider, identifier, displayName };
     const newAccessToken = await JWTController.accessGenerate(payload);
     const newRefreshToken = await JWTController.refreshGenerate(payload);
     res.send({
@@ -54,8 +53,8 @@ router.get("/check_refresh", async (req, res) => {
   const token = queryData.token;
   try {
     const decoded = await JWTController.refreshVerify(token);
-    const { provider, id, displayName } = decoded;
-    const payload = { provider, id, displayName };
+    const { id, provider, identifier, displayName } = decoded;
+    const payload = { id, provider, identifier, displayName };
     const newAccessToken = await JWTController.accessGenerate(payload);
     const newRefreshToken = await JWTController.refreshGenerate(payload);
     res.send({
