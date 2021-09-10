@@ -16,6 +16,7 @@ var logger = require("morgan");
 const passport = require("passport");
 
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
+const KakaoStrategy = require("passport-kakao").Strategy;
 
 const GOOGLE_CLIENT_ID =
   "647766314048-9odi2ct7sk8u9ab0a3vbsfrr0qmget9s.apps.googleusercontent.com";
@@ -61,16 +62,18 @@ passport.use(
       passReqToCallback: true,
     },
     async (request, accessToken, requestToken, profile, done) => {
-      // console.log("Profile: ", profile);
-      // console.log("Access Token: ", accessToken);
-      console.log({ accessToken, requestToken, profile });
-      const email = profile.email;
-
-      // console.log("Refresh Token: ", refreshToken);
-      return done(null, profile, {
-        message: "OK!",
-        profile,
-      });
+      return done(null, profile);
+    }
+  )
+);
+passport.use(
+  new KakaoStrategy(
+    {
+      clientID: "18503829865224a114248bf9c9c4593c",
+      callbackURL: "http://localhost:3000/api/auth_social/kakao/callback",
+    },
+    function (accessToken, refreshToken, profile, done) {
+      return done(null, profile);
     }
   )
 );

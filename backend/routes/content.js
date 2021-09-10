@@ -1,6 +1,6 @@
 let express = require("express");
 let mysql = require("mysql");
-var url = require("url");
+let url = require("url");
 let router = express.Router();
 let dbconfig = require("../key/dbkey");
 

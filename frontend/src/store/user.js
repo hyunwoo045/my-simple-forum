@@ -7,20 +7,23 @@ export default {
   state: () => {
     return {
       isLoggedIn: false,
+      provider: "forum",
       id: -1,
       nickname: "",
     };
   },
   mutations: {
     setState(state, payload) {
-      const { id, nickname } = payload;
+      const { provider, id, displayName } = payload;
       state.isLoggedIn = true;
+      state.provider = provider;
       state.id = id;
-      state.nickname = nickname;
+      state.nickname = displayName;
     },
     resetState(state) {
       state.id = -1;
       state.nickname = "";
+      state.provider = "forum";
       state.isLoggedIn = false;
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
@@ -29,8 +32,8 @@ export default {
   actions: {
     async AccessTokenHandler({ commit }) {
       try {
-        const { nickname, id } = await verifyAccessToken();
-        commit("setState", { nickname, id });
+        const payload = await verifyAccessToken();
+        commit("setState", payload);
         return "OK";
       } catch (err) {
         return err;
@@ -38,8 +41,8 @@ export default {
     },
     async RefreshTokenHandler({ commit }) {
       try {
-        const { nickname, id } = await verifyRefreshToken();
-        commit("setState", { nickname, id });
+        const payload = await verifyRefreshToken();
+        commit("setState", payload);
         return "OK";
       } catch (err) {
         return err;
@@ -61,10 +64,7 @@ function verifyAccessToken() {
           if (data.message === "VALID_TOKEN") {
             localStorage.setItem("accessToken", data.accessToken);
             localStorage.setItem("refreshToken", data.refreshToken);
-            resolve({
-              nickname: data.decoded.nickname,
-              id: data.decoded.id,
-            });
+            resolve(data.payload);
           } else {
             reject("NOT_VALID_ACCESS_TOKEN");
           }
@@ -86,10 +86,7 @@ function verifyRefreshToken() {
           if (data.message === "VALID_REFRESH_TOKEN") {
             localStorage.setItem("accessToken", data.accessToken);
             localStorage.setItem("refreshToken", data.refreshToken);
-            resolve({
-              nickname: data.decoded.nickname,
-              id: data.decoded.id,
-            });
+            resolve(data.payload);
           } else {
             reject("NOT_VALID_REFRESH_TOKEN");
           }
