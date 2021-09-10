@@ -25,7 +25,7 @@ router.get(
       }
       const payload = { id, provider, identifier, displayName };
       const accessToken = await JWTController.accessGenerate(payload);
-      const refreshToken = await JWTController.accessGenerate(payload);
+      const refreshToken = await JWTController.refreshGenerate(payload);
       res.cookie("accessToken", accessToken);
       res.cookie("refreshToken", refreshToken);
       res.redirect(`${endpoint}loginsuccess`);
@@ -51,7 +51,7 @@ router.get(
       }
       const payload = { id, provider, identifier, displayName };
       const accessToken = await JWTController.accessGenerate(payload);
-      const refreshToken = await JWTController.accessGenerate(payload);
+      const refreshToken = await JWTController.refreshGenerate(payload);
       res.cookie("accessToken", accessToken);
       res.cookie("refreshToken", refreshToken);
       res.redirect(`${endpoint}loginsuccess`);
