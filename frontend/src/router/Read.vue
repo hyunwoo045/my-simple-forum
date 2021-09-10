@@ -119,7 +119,7 @@ export default {
   },
   methods: {
     modifyHandler() {
-      if (this.contentAuthor !== this.$store.state.user.nickname) {
+      if (!this.thisUserUpdatable) {
         alert("수정 권한이 없습니다.");
         return;
       }
@@ -134,7 +134,7 @@ export default {
       });
     },
     deleteHandler() {
-      if (this.contentAuthor !== this.$store.state.user.nickname) {
+      if (!this.thisUserUpdatable) {
         alert("삭제 권한이 없습니다.");
         return;
       }

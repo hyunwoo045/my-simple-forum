@@ -8,12 +8,12 @@ const User = {
   find: (provider, id) => {
     return new Promise((resolve, reject) => {
       conn.query(
-        "SELECT id FROM user_test WHERE provider=? AND identifier=?",
+        "SELECT id FROM user WHERE provider=? AND identifier=?",
         [provider, id],
         (err, res) => {
           if (err) reject(err);
           console.log(res);
-          if (res.length === 0) {
+          if (res[0] === undefined) {
             resolve(false);
           } else {
             resolve(res[0].id);
@@ -25,7 +25,7 @@ const User = {
   create: (provider, id, displayName) => {
     return new Promise((resolve, reject) => {
       conn.query(
-        "INSERT INTO user_test(provider, identifier, nickname) VALUES (?, ?, ?)",
+        "INSERT INTO user(provider, identifier, nickname) VALUES (?, ?, ?)",
         [provider, id, displayName],
         (err) => {
           if (err) reject(err);

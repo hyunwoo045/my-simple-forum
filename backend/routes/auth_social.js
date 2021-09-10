@@ -3,33 +3,10 @@ const router = express.Router();
 const passport = require("passport");
 const User = require("../models/user");
 const endpoint = require("../key/endpoint").endpoint;
+const JWTController = require("../models/token");
 
-router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["email", "profile"] })
-);
-
+router.get("/google", passport.authenticate("google", { scope: ["profile"] }));
 router.get("/kakao", passport.authenticate("kakao"));
-
-// router.get("/google/callback", (req, res) => {
-//   passport.authenticate("google", async (err, user, info) => {
-//     if (err) throw err;
-//     console.log(user);
-//     const email = info.profile.email;
-//     try {
-//       const payload = await User.getUserInfo(email);
-//       const { id, nickname } = payload;
-//       res.cookie("id", id);
-//       res.cookie("nickname", nickname);
-//       res.redirect(
-//         // `${endpoint}loginsuccess?id=${id}&nickname=${nickname}`
-//         `${endpoint}loginsuccess`
-//       );
-//     } catch (err) {
-//       res.redirect(`${endpoint}signin?email=${info.profile.email}`);
-//     }
-//   })(req, res);
-// });
 
 router.get(
   "/google/callback",
@@ -37,21 +14,50 @@ router.get(
     failureRedirect: `${endpoint}login`,
   }),
   async (req, res) => {
-    res.redirect(
-      `/api/auth?provider=google&identifier=${req.user.id}&displayName=${req.user.displayName}`
-    );
+    const provider = "google";
+    const identifier = req.user.id;
+    const displayName = `G-${req.user.displayName}`;
+    try {
+      let id = await User.find(provider, identifier);
+      if (!id) {
+        User.create(provider, identifier, displayName);
+        id = await User.find(provider, identifier);
+      }
+      const payload = { id, provider, identifier, displayName };
+      const accessToken = await JWTController.accessGenerate(payload);
+      const refreshToken = await JWTController.accessGenerate(payload);
+      res.cookie("accessToken", accessToken);
+      res.cookie("refreshToken", refreshToken);
+      res.redirect(`${endpoint}loginsuccess`);
+    } catch (err) {
+      throw err;
+    }
   }
 );
-
 router.get(
   "/kakao/callback",
   passport.authenticate("kakao", {
     failureRedirect: `${endpoint}login`,
   }),
   async (req, res) => {
-    res.redirect(
-      `/api/auth?provider=kakao&identifier=${req.user.id}&displayName=${req.user.displayName}`
-    );
+    const provider = "kakao";
+    const identifier = req.user.id;
+    const displayName = `Kakao-${req.user.displayName}`;
+    try {
+      let id = await User.find(provider, identifier);
+      if (!id) {
+        User.create(provider, identifier, displayName);
+        id = await User.find(provider, identifier);
+      }
+      const payload = { id, provider, identifier, displayName };
+      const accessToken = await JWTController.accessGenerate(payload);
+      const refreshToken = await JWTController.accessGenerate(payload);
+      res.cookie("accessToken", accessToken);
+      res.cookie("refreshToken", refreshToken);
+      res.redirect(`${endpoint}loginsuccess`);
+    } catch (err) {
+      throw err;
+    }
   }
 );
 

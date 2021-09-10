@@ -6,23 +6,28 @@ const User = require("../models/user");
 const JWTController = require("../models/token");
 const endpoint = require("../key/endpoint").endpoint;
 
-router.get("/", async (req, res) => {
-  const _url = req.url;
-  const queryData = url.parse(_url, true).query;
-  const { provider, identifier, displayName } = queryData;
-  try {
-    const id = await User.find(provider, identifier);
-    if (!id) User.create(provider, identifier, displayName);
-    const payload = { id, provider, identifier, displayName };
-    const accessToken = await JWTController.accessGenerate(payload);
-    const refreshToken = await JWTController.accessGenerate(payload);
-    res.cookie("accessToken", accessToken);
-    res.cookie("refreshToken", refreshToken);
-    res.redirect(`${endpoint}loginsuccess`);
-  } catch (err) {
-    throw err;
-  }
-});
+// router.get("/", async (req, res) => {
+//   const _url = req.url;
+//   const queryData = url.parse(_url, true).query;
+//   let { provider, identifier, displayName } = queryData;
+//   if (provider === "google") displayName = `G-${displayName}`;
+//   else if (provider === "kakao") displayName = `Kakao-${displayName}`;
+//   try {
+//     let id = await User.find(provider, identifier);
+//     if (!id) {
+//       User.create(provider, identifier, displayName);
+//       id = await User.find(provider, identifier);
+//     }
+//     const payload = { id, provider, identifier, displayName };
+//     const accessToken = await JWTController.accessGenerate(payload);
+//     const refreshToken = await JWTController.accessGenerate(payload);
+//     res.cookie("accessToken", accessToken);
+//     res.cookie("refreshToken", refreshToken);
+//     res.redirect(`${endpoint}loginsuccess`);
+//   } catch (err) {
+//     throw err;
+//   }
+// });
 
 router.get("/check", async (req, res) => {
   const _url = req.url;
