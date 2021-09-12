@@ -3,9 +3,9 @@
     <div class="container">
       <div class="content-area-top">
         <div class="title">
-          {{ contentTitle }}
+          {{ content.title }}
         </div>
-        <div class="author">작성자: {{ contentAuthor }}</div>
+        <div class="author">작성자: {{ content.author }}</div>
         <div class="links">
           <span @click="modifyHandler">수정</span>
           <span @click="deleteHandler">삭제</span>
@@ -21,7 +21,6 @@
     <div class="container">
       <div class="comment-area">
         <div class="comment-area label">댓글</div>
-        <!-- <div class="comment-area inputs" v-if="$store.state.user.isLoggedIn"> -->
         <div class="comment-area inputs">
           <div class="comment-write">
             <textarea
@@ -32,9 +31,6 @@
           </div>
           <button class="comment-submit" @click="addComment">작성</button>
         </div>
-        <!-- <div class="comment-area inputs" v-else>
-          로그인 후 댓글을 작성해 주세요!
-        </div> -->
 
         <div class="comment-area comments">
           <div
@@ -81,16 +77,14 @@ export default {
     /*
       글 정보 가져온 후에 댓글 목록 가져오기
     */
-    this.contentId = this.$route.query.id;
     this.$http
       .get(`${defaultAPI.end_point}/content?id=${this.$route.query.id}`)
       .then((response) => {
-        this.contentTitle = response.data[0].title;
-        this.contentDescription = response.data[0].description;
-        this.contentAuthor = response.data[0].author;
-        if (response.data[0].user_id === this.$store.state.user.id) {
+        const { id, user_id, title, description, author } = response.data[0];
+        this.content = { id, user_id, title, description, author };
+        if (user_id === this.$store.state.user.id)
           this.thisUserUpdatable = true;
-        }
+
         this.$http
           .get(`${defaultAPI.end_point}/comment?id=${this.$route.query.id}`)
           .then((response) => {
@@ -100,19 +94,22 @@ export default {
   },
   data() {
     return {
-      contentId: -1,
-      contentTitle: "",
-      contentDescription: "",
-      contentAuthor: "",
+      content: {
+        id: -1,
+        user_id: -1,
+        title: "",
+        description: "",
+        author: "",
+      },
+      thisUserUpdatable: false,
       curCommentIdx: -1,
       comments: [],
       commentDescription: "",
-      thisUserUpdatable: false,
     };
   },
   computed: {
     cleanHTML() {
-      return sanitizeHTML(this.contentDescription, {
+      return sanitizeHTML(this.content.description, {
         allowedTags: sanitizeHTML.defaults.allowedTags.concat(["strike"]),
       });
     },
@@ -126,10 +123,8 @@ export default {
       this.$router.push({
         name: "Add",
         params: {
+          id: this.content.id,
           mode: "modify",
-          contentId: this.contentId,
-          title: this.contentTitle,
-          description: this.contentDescription,
         },
       });
     },
@@ -142,7 +137,7 @@ export default {
       if (confirm("정말 삭제하시겠습니까?") === true) {
         this.$http
           .post(`${defaultAPI.end_point}/content/delete`, {
-            id: this.contentId,
+            id: this.content.id,
           })
           .then(() => {
             this.$router.push("/");
@@ -157,7 +152,7 @@ export default {
         .post(`${defaultAPI.end_point}/comment/create`, {
           user_id: this.$store.state.user.id,
           description: this.commentDescription,
-          content_id: this.contentId,
+          content_id: this.content.id,
         })
         .then(() => {
           this.$http

@@ -1,5 +1,5 @@
 <template>
-  <div>구글 아이디로 로그인 합니다. 잠시만 기다려 주세요</div>
+  <div>소셜 로그인에 성공하였습니다. 잠시만 기다려 주세요</div>
 </template>
 
 <script>

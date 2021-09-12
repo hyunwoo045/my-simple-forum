@@ -7,7 +7,7 @@
       <div class="title">
         <input
           type="text"
-          v-model="curTitle"
+          v-model="input.title"
           placeholder="제목을 입력하세요."
         />
       </div>
@@ -15,21 +15,20 @@
         <input
           type="radio"
           name="input_type"
-          value="HTML"
-          v-model="curInputType"
-          checked
+          value="html"
+          v-model="input.type"
         />
         HTML
         <input
           type="radio"
           name="input_type"
-          value="Markdown"
-          v-model="curInputType"
+          value="markdown"
+          v-model="input.type"
         />
         Markdown
       </div>
 
-      <div class="description html" v-if="curInputType === 'HTML'">
+      <div class="description html" v-if="input.type === 'html'">
         <div class="btn-area">
           <button @click="styleHandler('bold')">
             <b>B</b>
@@ -47,12 +46,12 @@
           <button @click="styleHandler('insertUnorderedList')">ul</button>
         </div>
         <div class="textarea" contenteditable="true" ref="desc">
-          <p v-html="description"></p>
+          <p v-html="input.description"></p>
         </div>
       </div>
 
-      <div class="description markdown" v-else-if="curInputType === 'Markdown'">
-        <textarea class="textarea markdown" v-model="md_text"></textarea>
+      <div class="description markdown" v-else-if="input.type === 'markdown'">
+        <textarea class="textarea markdown" v-model="input.md_text"></textarea>
       </div>
     </div>
 
@@ -74,25 +73,29 @@ export default {
       type: String,
       default: "",
     },
-    contentId: {
+    id: {
       type: Number,
       default: -1,
     },
-    title: {
-      type: String,
-      default: "",
-    },
-    description: {
-      type: String,
-      default: "",
-    },
+  },
+  created() {
+    if (this.id !== -1) {
+      this.$http
+        .get(`${defaultAPI.end_point}/content?id=${this.id}`)
+        .then((response) => {
+          const { title, description, type, md_text } = response.data[0];
+          this.input = { title, description, type, md_text };
+        });
+    }
   },
   data() {
     return {
-      curTitle: this.title,
-      curDesc: this.description,
-      curInputType: "HTML",
-      md_text: "",
+      input: {
+        title: "",
+        description: "",
+        type: "html",
+        md_text: "",
+      },
     };
   },
   computed: {
@@ -108,7 +111,7 @@ export default {
         smartLists: true,
         smartypants: false,
       });
-      return marked(this.md_text);
+      return marked(this.input.md_text);
     },
   },
   methods: {
@@ -116,13 +119,12 @@ export default {
       this.$router.go(-1);
     },
     createHandler() {
-      console.log(this.$store.state.user.id);
       const lastInputDescription =
-        this.curInputType === "HTML"
+        this.curInputType === "html"
           ? this.$refs.desc.innerHTML
           : this.markdownToHTML;
 
-      if (this.curTitle === "") {
+      if (this.input.title === "") {
         alert("제목을 입력하세요.");
         return;
       } else if (lastInputDescription === "") {
@@ -136,13 +138,14 @@ export default {
       } else {
         url = `${defaultAPI.end_point}/content/create`;
       }
-      console.log(this.$store.state.user.id);
       this.$http
         .post(url, {
-          id: this.contentId,
+          id: this.id,
           user_id: this.$store.state.user.id,
-          title: this.curTitle,
+          title: this.input.title,
           description: lastInputDescription,
+          type: this.input.type,
+          md_text: this.input.md_text,
         })
         .then(() => {
           this.$router.push("/");

@@ -15,7 +15,7 @@ router.get("/", (req, res) => {
   let id = queryData.id;
   if (id === undefined) {
     connection.query(
-      "SELECT contents.id, user_id, user.nickname AS author, title, description, created, updated FROM contents LEFT JOIN user ON user_id = user.id ORDER BY created DESC LIMIT 0, 10;",
+      "SELECT contents.id, user_id, user.nickname AS author, title, description, created, updated, type, md_text FROM contents LEFT JOIN user ON user_id = user.id ORDER BY created DESC LIMIT 0, 10;",
       (err, topics) => {
         if (err) throw err;
         connection.query(
@@ -34,7 +34,7 @@ router.get("/", (req, res) => {
     );
   } else {
     connection.query(
-      "SELECT contents.id, user_id, user.nickname AS author, title, description, created, updated FROM contents LEFT JOIN user ON user_id = user.id WHERE contents.id=? ORDER BY created DESC LIMIT 0, 10;",
+      "SELECT contents.id, user_id, user.nickname AS author, title, description, created, updated, type, md_text FROM contents LEFT JOIN user ON user_id = user.id WHERE contents.id=? ORDER BY created DESC LIMIT 0, 10;",
       [id],
       (err, topics) => {
         if (err) throw err;
@@ -70,16 +70,14 @@ router.get("/page", (req, res) => {
 /* CREATE CONTENT */
 /* /api/content/create */
 router.post("/create", function (req, res) {
-  let user_id = req.body.user_id;
-  let title = req.body.title;
-  let description = req.body.description;
+  const { title, description, user_id, type, md_text } = req.body;
 
   let connection = mysql.createConnection(dbconfig);
   connection.connect();
 
   connection.query(
-    "INSERT INTO contents (title, description, user_id, created, updated) VALUES(?, ?, ?, NOW(), NOW())",
-    [title, description, user_id],
+    "INSERT INTO contents (title, description, user_id, created, updated, type, md_text) VALUES(?, ?, ?, NOW(), NOW(), ?, ?)",
+    [title, description, user_id, type, md_text],
     (err) => {
       if (err) throw err;
       connection.end();
@@ -91,16 +89,13 @@ router.post("/create", function (req, res) {
 /* UPDATE CONTENT */
 /* /api/content/modify */
 router.post("/modify", function (req, res) {
-  let id = String(req.body.id);
-  let title = req.body.title;
-  let description = req.body.description;
-
+  const { title, description, type, md_text, id } = req.body;
   let connection = mysql.createConnection(dbconfig);
   connection.connect();
 
   connection.query(
-    "UPDATE contents SET title=?, description=?, updated=NOW() WHERE id=?",
-    [title, description, id],
+    "UPDATE contents SET title=?, description=?, updated=NOW(), type=?, md_text=? WHERE id=?",
+    [title, description, type, md_text, id],
     (err) => {
       if (err) throw err;
       connection.end();

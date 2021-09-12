@@ -3,7 +3,7 @@ import Container from "./Container";
 import Add from "./Add";
 import Read from "./Read";
 import Login from "./Login";
-import Signin from "./Signin";
+// import Signin from "./Signin";
 import Home from "./Home";
 import LoginSuccess from "./LoginSuccess";
 
@@ -26,19 +26,19 @@ export default createRouter({
         }
       },
     },
-    {
-      path: "/signin",
-      component: Signin,
-      name: "Signin",
-      beforeEnter: (to, from, next) => {
-        if (store.state.user.isLoggedIn) {
-          alert("잘못된 경로 접근입니다.");
-          next("/");
-        } else {
-          next();
-        }
-      },
-    },
+    // {
+    //   path: "/signin",
+    //   component: Signin,
+    //   name: "Signin",
+    //   beforeEnter: (to, from, next) => {
+    //     if (store.state.user.isLoggedIn) {
+    //       alert("잘못된 경로 접근입니다.");
+    //       next("/");
+    //     } else {
+    //       next();
+    //     }
+    //   },
+    // },
     {
       path: "/loginsuccess",
       component: LoginSuccess,

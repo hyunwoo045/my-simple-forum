@@ -81,10 +81,4 @@ export default {
     }
   }
 }
-
-test {
-  test-for {
-    background-color: black;
-  }
-}
 </style>

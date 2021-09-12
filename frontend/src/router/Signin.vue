@@ -91,7 +91,6 @@ export default {
           nickname: this.nicknameInput,
         })
         .then((res) => {
-          console.log(res.data);
           if (res.data === "DUP_NICKNAME") {
             this.errMessage = "중복된 닉네임입니다.";
           } else {
