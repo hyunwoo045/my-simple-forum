@@ -18,9 +18,11 @@ const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
 const KakaoStrategy = require("passport-kakao").Strategy;
 
-const GOOGLE_CLIENT_ID =
-  "647766314048-9odi2ct7sk8u9ab0a3vbsfrr0qmget9s.apps.googleusercontent.com";
-const GOOGLE_CLIENT_SECRET = "jDDiurwy2D6b-1afqPW5hcvR";
+const googleClientConfig = require("../key/config").google;
+const GOOGLE_CLIENT_ID = googleClientConfig.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = googleClientConfig.GOOGLE_CLIENT_SECRET;
+const kakaoClientConfig = require("../key/config").kakao;
+const KAKAO_CLIENT_ID = kakaoClientConfig.KAKAO_CLIENT_ID;
 
 var commentRouter = require("./routes/comment");
 var contentRouter = require("./routes/content");
@@ -69,7 +71,7 @@ passport.use(
 passport.use(
   new KakaoStrategy(
     {
-      clientID: "18503829865224a114248bf9c9c4593c",
+      clientID: KAKAO_CLIENT_ID,
       callbackURL: "http://localhost:3000/api/auth_social/kakao/callback",
     },
     function (accessToken, refreshToken, profile, done) {
