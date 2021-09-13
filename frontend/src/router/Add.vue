@@ -85,6 +85,7 @@ export default {
         .then((response) => {
           const { title, description, type, md_text } = response.data[0];
           this.input = { title, description, type, md_text };
+          if (md_text === null) this.input.md_text = "";
         });
     }
   },
@@ -120,10 +121,9 @@ export default {
     },
     createHandler() {
       const lastInputDescription =
-        this.curInputType === "html"
+        this.input.type === "html"
           ? this.$refs.desc.innerHTML
           : this.markdownToHTML;
-
       if (this.input.title === "") {
         alert("제목을 입력하세요.");
         return;
