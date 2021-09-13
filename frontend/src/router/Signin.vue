@@ -49,7 +49,8 @@
 </template>
 
 <script>
-import defaultAPI from "~/core/defaultAPI";
+import config from "~/key/config";
+const endpoint = config.endpoint;
 export default {
   created() {
     this.email = this.$route.query.email;
@@ -86,7 +87,7 @@ export default {
       }
 
       this.$http
-        .post(`${defaultAPI.end_point}/auth/register`, {
+        .post(`${endpoint}/auth/register`, {
           email: this.email,
           nickname: this.nicknameInput,
         })

@@ -54,7 +54,8 @@
 </template>
 
 <script>
-import defaultAPI from "~/core/defaultAPI";
+import config from "~/key/config";
+const endpoint = config.endpoint;
 
 export default {
   created() {
@@ -63,14 +64,14 @@ export default {
       author query가 정의되어 있으면 작성자=author 로 필터링
     */
     if (this.$route.query.user_id === undefined) {
-      this.$http.get(`${defaultAPI.end_point}/content`).then((response) => {
+      this.$http.get(`${endpoint}/content`).then((response) => {
         this.contents = response.data.topics;
         this.maxPageNumber = Math.ceil(response.data.length / 10);
       });
     } else {
       this.$http
         .get(
-          `${defaultAPI.end_point}/content/get_by_author?user_id=${this.$route.query.user_id}`
+          `${endpoint}/content/get_by_author?user_id=${this.$route.query.user_id}`
         )
         .then((response) => {
           this.contents = response.data;
@@ -103,21 +104,19 @@ export default {
   },
   methods: {
     readContent(id) {
-      this.$http
-        .get(`${defaultAPI.end_point}/content?id=${id}`)
-        .then((response) => {
-          let data = response.data[0];
-          this.$router.push({
-            name: "Read",
-            query: {
-              id: data.id,
-            },
-          });
+      this.$http.get(`${endpoint}/content?id=${id}`).then((response) => {
+        let data = response.data[0];
+        this.$router.push({
+          name: "Read",
+          query: {
+            id: data.id,
+          },
         });
+      });
     },
     pageHandler(pageNumber) {
       this.$http
-        .get(`${defaultAPI.end_point}/content/page?page=${pageNumber - 1}`)
+        .get(`${endpoint}/content/page?page=${pageNumber - 1}`)
         .then((response) => {
           this.contents = response.data;
           this.currentPage = pageNumber;

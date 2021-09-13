@@ -18,10 +18,10 @@ const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
 const KakaoStrategy = require("passport-kakao").Strategy;
 
-const googleClientConfig = require("../key/config").google;
+const googleClientConfig = require("./key/config").google;
 const GOOGLE_CLIENT_ID = googleClientConfig.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = googleClientConfig.GOOGLE_CLIENT_SECRET;
-const kakaoClientConfig = require("../key/config").kakao;
+const kakaoClientConfig = require("./key/config").kakao;
 const KAKAO_CLIENT_ID = kakaoClientConfig.KAKAO_CLIENT_ID;
 
 var commentRouter = require("./routes/comment");

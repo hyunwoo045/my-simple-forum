@@ -63,8 +63,9 @@
 </template>
 
 <script>
-import defaultAPI from "~/core/defaultAPI";
 import marked from "marked";
+import config from "~/key/config";
+const endpoint = config.endpoint;
 
 export default {
   name: "Add",
@@ -80,13 +81,11 @@ export default {
   },
   created() {
     if (this.id !== -1) {
-      this.$http
-        .get(`${defaultAPI.end_point}/content?id=${this.id}`)
-        .then((response) => {
-          const { title, description, type, md_text } = response.data[0];
-          this.input = { title, description, type, md_text };
-          if (md_text === null) this.input.md_text = "";
-        });
+      this.$http.get(`${endpoint}/content?id=${this.id}`).then((response) => {
+        const { title, description, type, md_text } = response.data[0];
+        this.input = { title, description, type, md_text };
+        if (md_text === null) this.input.md_text = "";
+      });
     }
   },
   data() {
@@ -134,9 +133,9 @@ export default {
 
       let url = "";
       if (this.mode === "modify") {
-        url = `${defaultAPI.end_point}/content/modify`;
+        url = `${endpoint}/content/modify`;
       } else {
-        url = `${defaultAPI.end_point}/content/create`;
+        url = `${endpoint}/content/create`;
       }
       this.$http
         .post(url, {

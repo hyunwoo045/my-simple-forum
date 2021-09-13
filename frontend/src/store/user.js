@@ -1,5 +1,6 @@
 import axios from "axios";
-import defaultAPI from "~/core/defaultAPI";
+import config from "~/key/config";
+const endpoint = config.endpoint;
 
 export default {
   namespaced: true,
@@ -59,18 +60,16 @@ function verifyAccessToken() {
     if (!token) {
       reject("NEED_LOGIN");
     } else {
-      axios
-        .get(`${defaultAPI.end_point}/auth/check?token=${token}`)
-        .then((res) => {
-          const data = res.data;
-          if (data.message === "VALID_TOKEN") {
-            localStorage.setItem("accessToken", data.accessToken);
-            localStorage.setItem("refreshToken", data.refreshToken);
-            resolve(data.payload);
-          } else {
-            reject("NOT_VALID_ACCESS_TOKEN");
-          }
-        });
+      axios.get(`${endpoint}/auth/check?token=${token}`).then((res) => {
+        const data = res.data;
+        if (data.message === "VALID_TOKEN") {
+          localStorage.setItem("accessToken", data.accessToken);
+          localStorage.setItem("refreshToken", data.refreshToken);
+          resolve(data.payload);
+        } else {
+          reject("NOT_VALID_ACCESS_TOKEN");
+        }
+      });
     }
   });
 }
@@ -81,18 +80,16 @@ function verifyRefreshToken() {
     if (!token) {
       reject("NEED_LOGIN");
     } else {
-      axios
-        .get(`${defaultAPI.end_point}/auth/check_refresh?token=${token}`)
-        .then((res) => {
-          const data = res.data;
-          if (data.message === "VALID_REFRESH_TOKEN") {
-            localStorage.setItem("accessToken", data.accessToken);
-            localStorage.setItem("refreshToken", data.refreshToken);
-            resolve(data.payload);
-          } else {
-            reject("NOT_VALID_REFRESH_TOKEN");
-          }
-        });
+      axios.get(`${endpoint}/auth/check_refresh?token=${token}`).then((res) => {
+        const data = res.data;
+        if (data.message === "VALID_REFRESH_TOKEN") {
+          localStorage.setItem("accessToken", data.accessToken);
+          localStorage.setItem("refreshToken", data.refreshToken);
+          resolve(data.payload);
+        } else {
+          reject("NOT_VALID_REFRESH_TOKEN");
+        }
+      });
     }
   });
 }

@@ -69,8 +69,10 @@
 </template>
 
 <script>
-import defaultAPI from "~/core/defaultAPI";
 import sanitizeHTML from "sanitize-html";
+
+import config from "~/key/config";
+const endpoint = config.endpoint;
 
 export default {
   created() {
@@ -78,7 +80,7 @@ export default {
       글 정보 가져온 후에 댓글 목록 가져오기
     */
     this.$http
-      .get(`${defaultAPI.end_point}/content?id=${this.$route.query.id}`)
+      .get(`${endpoint}/content?id=${this.$route.query.id}`)
       .then((response) => {
         const { id, user_id, title, description, author } = response.data[0];
         this.content = { id, user_id, title, description, author };
@@ -86,7 +88,7 @@ export default {
           this.thisUserUpdatable = true;
 
         this.$http
-          .get(`${defaultAPI.end_point}/comment?id=${this.$route.query.id}`)
+          .get(`${endpoint}/comment?id=${this.$route.query.id}`)
           .then((response) => {
             this.comments = response.data;
           });
@@ -136,7 +138,7 @@ export default {
 
       if (confirm("정말 삭제하시겠습니까?") === true) {
         this.$http
-          .post(`${defaultAPI.end_point}/content/delete`, {
+          .post(`${endpoint}/content/delete`, {
             id: this.content.id,
           })
           .then(() => {
@@ -149,14 +151,14 @@ export default {
 
     addComment() {
       this.$http
-        .post(`${defaultAPI.end_point}/comment/create`, {
+        .post(`${endpoint}/comment/create`, {
           user_id: this.$store.state.user.id,
           description: this.commentDescription,
           content_id: this.content.id,
         })
         .then(() => {
           this.$http
-            .get(`${defaultAPI.end_point}/comment?id=${this.contentId}`)
+            .get(`${endpoint}/comment?id=${this.contentId}`)
             .then((response) => {
               this.comments = response.data;
             });
@@ -171,12 +173,12 @@ export default {
 
       if (confirm("댓글을 정말 삭제하시겠습니까?") === true) {
         this.$http
-          .post(`${defaultAPI.end_point}/comment/delete`, {
+          .post(`${endpoint}/comment/delete`, {
             id,
           })
           .then(() => {
             this.$http
-              .get(`${defaultAPI.end_point}/comment?id=${this.contentId}`)
+              .get(`${endpoint}/comment?id=${this.contentId}`)
               .then((response) => {
                 this.comments = response.data;
               });
