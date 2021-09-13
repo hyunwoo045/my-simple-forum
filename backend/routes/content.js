@@ -1,8 +1,8 @@
-let express = require("express");
-let mysql = require("mysql");
-let url = require("url");
-let router = express.Router();
-let dbconfig = require("../key/dbkey");
+const express = require("express");
+const mysql = require("mysql");
+const url = require("url");
+const router = express.Router();
+const dbconfig = require("../key/config").database;
 
 /* READ CONTENTS */
 /* /api/content | /api/content?id=[] */

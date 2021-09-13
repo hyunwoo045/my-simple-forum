@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
-const jwtSecret = require("../key/secretKey");
-
+const jwtSecret = require("../key/config").jwt;
 const secret = jwtSecret.secret;
 const accessOption = jwtSecret.accessOption;
 const refreshOption = jwtSecret.refreshOption;

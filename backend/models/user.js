@@ -1,7 +1,6 @@
 const mysql = require("mysql");
-const crypto = require("crypto");
-
-const dbconfig = require("../key/dbkey");
+// const crypto = require("crypto");
+const dbconfig = require("../key/config").database;
 const conn = mysql.createConnection(dbconfig);
 
 const User = {

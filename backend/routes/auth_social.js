@@ -2,9 +2,17 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const User = require("../models/user");
-const endpoint = require("../key/endpoint").endpoint;
 const JWTController = require("../models/token");
+const endpoint = require("../key/config").endpoint;
 
+/* 
+  f: tokenGenerator({ provider, identifier, displayName })
+  - provider: 소셜 로그인 기능을 제공한 주체 (google, kakao 등)
+  - identifier: provider가 제공한 고유 일련번호
+  - displayName: provider가 제공한 유저 네임
+
+  return: 자체 JWT 토큰 생성기로 생성된 { accesstoken, refreshtoken }
+*/
 const tokenGenerator = async (payload) => {
   const { provider, identifier, displayName } = payload;
   try {
