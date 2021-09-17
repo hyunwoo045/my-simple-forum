@@ -3,47 +3,56 @@ const mysql = require("mysql");
 const url = require("url");
 const router = express.Router();
 const dbconfig = require("../key/config").database;
+const passport = require("passport");
+const endpoint = require("../key/config").endpoint;
 
 /* READ CONTENTS */
 /* /api/content | /api/content?id=[] */
-router.get("/", (req, res) => {
-  let connection = mysql.createConnection(dbconfig);
-  connection.connect();
+router.get(
+  "/",
+  passport.authenticate("google", {
+    successRedirect: `${endpoint}`,
+    failureRedirect: `${endpoint}login`,
+  }),
+  (req, res) => {
+    let connection = mysql.createConnection(dbconfig);
+    connection.connect();
 
-  let _url = req.url;
-  let queryData = url.parse(_url, true).query;
-  let id = queryData.id;
-  if (id === undefined) {
-    connection.query(
-      "SELECT contents.id, user_id, user.nickname AS author, title, description, created, updated, type, md_text FROM contents LEFT JOIN user ON user_id = user.id ORDER BY created DESC LIMIT 0, 10;",
-      (err, topics) => {
-        if (err) throw err;
-        connection.query(
-          "SELECT COUNT(*) AS length FROM contents",
-          (err, contentCnt) => {
-            connection.end();
-            res.send({
-              length: contentCnt[0].length,
-              topics,
-            });
-          }
-        );
-        // connection.end();
-        // res.send(topics);
-      }
-    );
-  } else {
-    connection.query(
-      "SELECT contents.id, user_id, user.nickname AS author, title, description, created, updated, type, md_text FROM contents LEFT JOIN user ON user_id = user.id WHERE contents.id=? ORDER BY created DESC LIMIT 0, 10;",
-      [id],
-      (err, topics) => {
-        if (err) throw err;
-        connection.end();
-        res.send(topics);
-      }
-    );
+    let _url = req.url;
+    let queryData = url.parse(_url, true).query;
+    let id = queryData.id;
+    if (id === undefined) {
+      connection.query(
+        "SELECT contents.id, user_id, user.nickname AS author, title, description, created, updated, type, md_text FROM contents LEFT JOIN user ON user_id = user.id ORDER BY created DESC LIMIT 0, 10;",
+        (err, topics) => {
+          if (err) throw err;
+          connection.query(
+            "SELECT COUNT(*) AS length FROM contents",
+            (err, contentCnt) => {
+              connection.end();
+              res.send({
+                length: contentCnt[0].length,
+                topics,
+              });
+            }
+          );
+          // connection.end();
+          // res.send(topics);
+        }
+      );
+    } else {
+      connection.query(
+        "SELECT contents.id, user_id, user.nickname AS author, title, description, created, updated, type, md_text FROM contents LEFT JOIN user ON user_id = user.id WHERE contents.id=? ORDER BY created DESC LIMIT 0, 10;",
+        [id],
+        (err, topics) => {
+          if (err) throw err;
+          connection.end();
+          res.send(topics);
+        }
+      );
+    }
   }
-});
+);
 
 /* READ MORE CONTENTS */
 /* /api/content/page?page={} */

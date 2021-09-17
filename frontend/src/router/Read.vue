@@ -1,5 +1,6 @@
 <template>
   <div class="content-detail">
+    <!-- 글의 상세 정보를 랜더링하는 레이아웃 -->
     <div class="container">
       <div class="content-area-top">
         <div class="title">
@@ -13,11 +14,14 @@
       </div>
       <div class="content-area-bottom">
         <div class="description">
+          <!-- html 문서로 작성된 글을 sanitize 모듈을 이용하여 XSS 공격 방지 -->
+          <!-- computed: cleanHTML이 필터링 된 HTML문서를 반환해 줌 -->
           <p class="input result" v-html="cleanHTML"></p>
         </div>
       </div>
     </div>
 
+    <!-- 댓글 목록을 렌더링 하는 레이아웃 -->
     <div class="container">
       <div class="comment-area">
         <div class="comment-area label">댓글</div>
@@ -33,6 +37,8 @@
         </div>
 
         <div class="comment-area comments">
+          <!-- 댓글에 마우스를 올리면 삭제 버튼이 나타남 -->
+          <!-- 마우스가 올라간 댓글의 index를 대응하기 위해 setCurrentCommentIndex 함수 사용 -->
           <div
             class="comment"
             v-for="(comment, commentIdx) in comments"
@@ -53,6 +59,7 @@
               <div class="description">
                 {{ comment.description }}
               </div>
+              <!-- 해당 댓글에 마우스가 올라와 있어야 (state.curCommentIdx === commentIdx) 삭제 버튼 나타남 -->
               <div
                 class="comment-delete"
                 @click="commentDelete(comment.user_id, comment.id)"
@@ -76,17 +83,17 @@ const endpoint = config.endpoint;
 
 export default {
   created() {
-    /*
-      글 정보 가져온 후에 댓글 목록 가져오기
-    */
+    /* query.id에 해당하는 글 정보 로드. { 글id, 작성자id, 제목, 내용, 작성자이름 } */
     this.$http
       .get(`${endpoint}/content?id=${this.$route.query.id}`)
       .then((response) => {
         const { id, user_id, title, description, author } = response.data[0];
         this.content = { id, user_id, title, description, author };
         if (user_id === this.$store.state.user.id)
+          // DB상 content.user_id과 현재 로그인 된 user_id 가 일치하면 수정/삭제 권한 부여
           this.thisUserUpdatable = true;
 
+        // 글id 와 연결되어 있는 댓글 목록을 가져옴
         this.$http
           .get(`${endpoint}/comment?id=${this.$route.query.id}`)
           .then((response) => {
@@ -96,6 +103,7 @@ export default {
   },
   data() {
     return {
+      // 글 정보 { 글id, 작성자id, 제목, 내용, 작성자이름 }
       content: {
         id: -1,
         user_id: -1,
@@ -103,13 +111,14 @@ export default {
         description: "",
         author: "",
       },
-      thisUserUpdatable: false,
-      curCommentIdx: -1,
-      comments: [],
-      commentDescription: "",
+      thisUserUpdatable: false, // 로그인 한 유저의 글 수정 가능 여부
+      comments: [], // 댓글 목록, element:{ 댓글id, 작성자id, 작성자이름, 내용, 생성일 }
+      curCommentIdx: -1, // mouse:hover 된 댓글의 index
+      commentDescription: "", // 작성 중인 댓글 내용. v-model로 연결.
     };
   },
   computed: {
+    /* DB로 부터 가져온 raw HTML을 sanitize로 필터링하여 반환함 */
     cleanHTML() {
       return sanitizeHTML(this.content.description, {
         allowedTags: sanitizeHTML.defaults.allowedTags.concat(["strike"]),

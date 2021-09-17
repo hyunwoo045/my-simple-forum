@@ -11,6 +11,8 @@
     "cors": "^2.8.5",
     "debug": "~2.6.9",
     "express": "~4.16.1",
+    "express-mysql-session": "^2.1.7",
+    "express-session": "^1.17.2",
     "google-auth-library": "^7.9.1",
     "http-errors": "~1.6.3",
     "jsonwebtoken": "^8.5.1",

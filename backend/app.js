@@ -14,6 +14,8 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 const passport = require("passport");
+const session = require("express-session");
+const MySQLStore = require("express-mysql-session")(session);
 
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
 const KakaoStrategy = require("passport-kakao").Strategy;
@@ -37,6 +39,11 @@ var app = express();
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 
+const dbConfig = require("./key/config").database;
+const sessionStore = new MySQLStore(dbConfig);
+const sessionConfig = require("./key/config").session;
+app.use(session({ ...sessionConfig, store: sessionStore }));
+
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -52,11 +59,17 @@ app.use("/api/auth", authRouter);
 app.use("/api/auth_social", authSocialRouter);
 
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+  done(null, {
+    id: user.id,
+    provider: user.provider,
+    displayName: user.displayName,
+  });
 });
-passport.deserializeUser((id, done) => {
-  done(null, id);
+passport.deserializeUser((user, done) => {
+  console.log("DESERIALIZED: ", user);
+  done(null, user);
 });
+
 passport.use(
   new GoogleStrategy(
     {
@@ -66,6 +79,7 @@ passport.use(
       passReqToCallback: true,
     },
     async (request, accessToken, requestToken, profile, done) => {
+      console.log("GOOGLE LOGIN!");
       return done(null, profile);
     }
   )

@@ -48,31 +48,33 @@ export default createRouter({
       path: "/",
       component: Home,
       name: "Home",
-      beforeEnter: (to, from, next) => {
-        if (store.state.user.isLoggedIn) {
-          next();
-        } else {
-          store.dispatch("user/AccessTokenHandler").then((res) => {
-            if (res === "NOT_VALID_ACCESS_TOKEN") {
-              store.dispatch("user/RefreshTokenHandler").then((res) => {
-                if (res === "NOT_VALID_REFRESH_TOKEN") {
-                  store.commit("user/resetState");
-                  alert("세션이 만료되었습니다.");
-                  next("/login");
-                } else {
-                  next();
-                }
-              });
-            } else if (res === "NEED_LOGIN") {
-              store.commit("user/resetState");
-              next("/login");
-              return;
-            } else {
-              next();
-            }
-          });
-        }
-      },
+      // beforeEnter: (to, from, next) => {
+      //   if (store.state.user.isLoggedIn) {
+      //     next();
+      //   } else {
+      //     store.dispatch("user/AccessTokenHandler").then((res) => {
+      //       if (res === "NOT_VALID_ACCESS_TOKEN") {
+      //         console.log("ACCESS TOKEN 만료");
+      //         store.dispatch("user/RefreshTokenHandler").then((res) => {
+      //           if (res === "NOT_VALID_REFRESH_TOKEN") {
+      //             console.log("REFRESH TOKEN 만료");
+      //             store.commit("user/resetState");
+      //             alert("세션이 만료되었습니다.");
+      //             next("/login");
+      //           } else {
+      //             next();
+      //           }
+      //         });
+      //       } else if (res === "NEED_LOGIN") {
+      //         store.commit("user/resetState");
+      //         next("/login");
+      //         return;
+      //       } else {
+      //         next();
+      //       }
+      //     });
+      // }
+      // },
       children: [
         {
           path: "",

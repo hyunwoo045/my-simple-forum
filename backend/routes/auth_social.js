@@ -13,6 +13,8 @@ const endpoint = require("../key/config").endpoint;
 
   return: 자체 JWT 토큰 생성기로 생성된 { accesstoken, refreshtoken }
 */
+
+/* OLD VER: TOKEN GENERATOR */
 const tokenGenerator = async (payload) => {
   const { provider, identifier, displayName } = payload;
   try {
@@ -24,7 +26,6 @@ const tokenGenerator = async (payload) => {
     const userPayload = { id, provider, identifier, displayName };
     const accessToken = await JWTController.accessGenerate(userPayload);
     const refreshToken = await JWTController.refreshGenerate(userPayload);
-
     return { accessToken, refreshToken };
   } catch (err) {
     throw err;
@@ -36,34 +37,35 @@ router.get("/kakao", passport.authenticate("kakao"));
 router.get(
   "/google/callback",
   passport.authenticate("google", {
+    successRedirect: `${endpoint}`,
     failureRedirect: `${endpoint}login`,
-  }),
-  async (req, res) => {
-    tokenGenerator({
-      provider: "google",
-      identifier: req.user.id,
-      displayName: `G-${req.user.displayName}`,
-    }).then((result) => {
-      res.cookie("accessToken", result.accessToken);
-      res.cookie("refreshToken", result.refreshToken);
-      res.redirect(`${endpoint}loginsuccess`);
-    });
-  }
+  })
+  // async (request, response) => {
+  // tokenGenerator({
+  //   provider: "google",
+  //   identifier: request.user.id,
+  //   displayName: `G-${request.user.displayName}`,
+  // }).then((result) => {
+  //   response.cookie("accessToken", result.accessToken);
+  //   response.cookie("refreshToken", result.refreshToken);
+  //   response.redirect(`${endpoint}loginsuccess`);
+  // });
+  // }
 );
 router.get(
   "/kakao/callback",
   passport.authenticate("kakao", {
     failureRedirect: `${endpoint}login`,
   }),
-  async (req, res) => {
+  async (request, response) => {
     tokenGenerator({
       provider: "kakao",
-      identifier: req.user.id,
-      displayName: `Kakao-${req.user.displayName}`,
+      identifier: request.user.id,
+      displayName: `Kakao-${request.user.displayName}`,
     }).then((result) => {
-      res.cookie("accessToken", result.accessToken);
-      res.cookie("refreshToken", result.refreshToken);
-      res.redirect(`${endpoint}loginsuccess`);
+      response.cookie("accessToken", result.accessToken);
+      response.cookie("refreshToken", result.refreshToken);
+      response.redirect(`${endpoint}loginsuccess`);
     });
   }
 );

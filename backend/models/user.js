@@ -11,7 +11,6 @@ const User = {
         [provider, id],
         (err, res) => {
           if (err) reject(err);
-          console.log(res);
           if (res[0] === undefined) {
             resolve(false);
           } else {
